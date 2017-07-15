@@ -7,6 +7,9 @@
 *.userosscache
 *.sln.docstates
 
+# Ignore the config file with a token in it
+config.json
+
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 

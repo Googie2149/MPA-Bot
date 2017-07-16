@@ -58,8 +58,26 @@ namespace MPA_Bot
 
             // If the command failed, notify the user
             if (!result.IsSuccess)
-                await message.Channel.SendMessageAsync($"**Something went wrong:** `{result.ErrorReason}`\n" +
-                    $"Poke Googie2149#1368 about it if the reason doesn't make sense.");
+            {
+                if (result.Error.HasValue)
+                {
+                    switch (result.Error.Value)
+                    {
+                        case CommandError.ParseFailed:
+                            await message.Channel.SendMessageAsync($"**Something went wrong:** That isn't an actual number!");
+                            break;
+                        case CommandError.BadArgCount:
+                            await message.Channel.SendMessageAsync($"**Something went wrong:** You're missing some parts of that command!");
+                            break;
+                        default:
+                            await message.Channel.SendMessageAsync($"**Something went wrong:** `{result.ErrorReason}`\n" +
+                                $"Poke Googie2149#1368 about it if the reason doesn't make sense.");
+                            break;
+                    }
+                }
+
+                
+            }
         }
 
         //private readonly IDependencyMap _map;

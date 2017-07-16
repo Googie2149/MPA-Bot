@@ -69,6 +69,8 @@ namespace MPA_Bot
                         case CommandError.BadArgCount:
                             await message.Channel.SendMessageAsync($"**Something went wrong:** You're missing some parts of that command!");
                             break;
+                        case CommandError.UnknownCommand:
+                            break;
                         default:
                             await message.Channel.SendMessageAsync($"**Something went wrong:** `{result.ErrorReason}`\n" +
                                 $"Poke Googie2149#1368 about it if the reason doesn't make sense.");

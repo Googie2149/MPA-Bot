@@ -17,13 +17,20 @@ using Newtonsoft.Json;
 
 namespace MPA_Bot.Modules.Standard
 {
-    public static class EventStorage
-    {
-        public static Dictionary<int, Event> ActiveEvents = new Dictionary<int, Event>();
-    }
+    //public static class EventStorage
+    //{
+    //    public static Dictionary<int, Event> ActiveEvents = new Dictionary<int, Event>();
+    //}
 
     public class Standard : ModuleBase
     {
+        private EventStorage events;
+
+        public Standard(EventStorage _events)
+        {
+            events = _events;
+        }
+
         private string Trim(string input)
         {
             int TrimLength = 100;
@@ -58,7 +65,7 @@ namespace MPA_Bot.Modules.Standard
         private Embed BuildEvent(Event buildEvent, int Index)
         {
             var Builder = new EmbedBuilder();
-
+            
             var embed = Builder
                 .WithColor(Color.DarkPurple)
                 .WithTitle($"Event {Index.ToString("00")} Details")
@@ -68,7 +75,7 @@ namespace MPA_Bot.Modules.Standard
                 "```\n" +
                 $"**Please try to be at the café {((buildEvent.Block != 0) ? $"in Block–{buildEvent.Block.ToString("000")} " : "")}10-15 minutes before the event starts.**\n" +
                 $"Players in Event {Index.ToString("00")}: **{buildEvent.Players.Count().ToString("00")}/{buildEvent.MaxPlayers.ToString("00")}**" +
-                $"{((buildEvent.Players.Count() >= buildEvent.MaxPlayers) ? "**[FULL]**" : "")}"
+                $"{((buildEvent.Players.Count() >= buildEvent.MaxPlayers) ? " **[FULL]**" : "")}"
                 );
 
             if (buildEvent.Players.Count() > 0)
@@ -221,6 +228,8 @@ namespace MPA_Bot.Modules.Standard
                 return;
             }
 
+            events.Save();
+
             Task.Run(async () =>
             {
                 await ReplyAsync("rip");
@@ -248,7 +257,7 @@ namespace MPA_Bot.Modules.Standard
                 return;
             }
 
-            if (EventStorage.ActiveEvents.ContainsKey(Index))
+            if (events.ActiveEvents.ContainsKey(Index))
             {
                 await ReplyAsync($"There's already an event running in slot {Index.ToString("00")}!");
                 return;
@@ -259,7 +268,7 @@ namespace MPA_Bot.Modules.Standard
             if (ownerJoining)
                 tempEvent.AddPlayer(Context.User, "");
 
-            EventStorage.ActiveEvents.Add(Index, tempEvent);
+            events.ActiveEvents.Add(Index, tempEvent);
 
             //await ReplyAsync($"{Context.User.Mention} created event {Index.ToString("00")}\n" +
             //    $"{tempEvent.Description}\n" +
@@ -267,7 +276,7 @@ namespace MPA_Bot.Modules.Standard
             //    $"Set/Edit Class: `>class {Index} [class]` or set it as you join.\n" +
             //    $"Players in Event {Index.ToString("00")}: `{tempEvent.Players.Count().ToString("00")}/{EventStorage.ActiveEvents[Index].MaxPlayers.ToString("00")}`");
 
-            await ReplyAsync($"{Context.User.Mention} created event {Index.ToString("00")}", embed: BuildEvent(EventStorage.ActiveEvents[Index], Index));
+            await ReplyAsync($"{Context.User.Mention} created event {Index.ToString("00")}", embed: BuildEvent(events.ActiveEvents[Index], Index));
         }
 
         [Command("close")]
@@ -278,13 +287,13 @@ namespace MPA_Bot.Modules.Standard
                 Index *= -1;
             }
 
-            if (!EventStorage.ActiveEvents.ContainsKey(Index))
+            if (!events.ActiveEvents.ContainsKey(Index))
             {
                 await ReplyAsync($"There is no event in slot {Index.ToString("00")}!");
                 return;
             }
 
-            EventStorage.ActiveEvents.Remove(Index);
+            events.ActiveEvents.Remove(Index);
 
             await ReplyAsync($"Event {Index.ToString("00")} has been closed.");
         }
@@ -292,7 +301,7 @@ namespace MPA_Bot.Modules.Standard
         [Command("list")]
         public async Task ListEvents()
         {
-            if (EventStorage.ActiveEvents.Count() == 0)
+            if (events.ActiveEvents.Count() == 0)
             {
                 await ReplyAsync($"There are no running events.");
                 return;
@@ -302,7 +311,7 @@ namespace MPA_Bot.Modules.Standard
 
             output.AppendLine("```markdown");
 
-            foreach (var kv in EventStorage.ActiveEvents)
+            foreach (var kv in events.ActiveEvents)
             {
                 output.AppendLine($"# Event {kv.Key.ToString("00")}");
                 output.AppendLine($"> {Trim(kv.Value.Description)}");
@@ -327,7 +336,7 @@ namespace MPA_Bot.Modules.Standard
                 Index *= -1;
             }
 
-            if (!EventStorage.ActiveEvents.ContainsKey(Index))
+            if (!events.ActiveEvents.ContainsKey(Index))
             {
                 await ReplyAsync($"There is no event in slot {Index.ToString("00")}!");
                 return;
@@ -363,7 +372,7 @@ namespace MPA_Bot.Modules.Standard
 
             //await ReplyAsync(output.ToString());
 
-            await ReplyAsync("", embed: BuildEvent(EventStorage.ActiveEvents[Index], Index));
+            await ReplyAsync("", embed: BuildEvent(events.ActiveEvents[Index], Index));
         }
 
         [Command("call")]
@@ -374,7 +383,7 @@ namespace MPA_Bot.Modules.Standard
                 Index *= -1;
             }
 
-            if (!EventStorage.ActiveEvents.ContainsKey(Index))
+            if (!events.ActiveEvents.ContainsKey(Index))
             {
                 await ReplyAsync($"There is no event in slot {Index.ToString("00")}!");
                 return;
@@ -404,7 +413,8 @@ namespace MPA_Bot.Modules.Standard
 
             //await ReplyAsync(output.ToString());
 
-            await ReplyAsync($"Calling all registered members:\n<@{string.Join(">, <@", EventStorage.ActiveEvents[Index].Players.Select(x => x.UserId))}>", embed: BuildEvent(EventStorage.ActiveEvents[Index], Index));
+            await ReplyAsync($"Calling all registered members:\n<@" +
+                $"{string.Join(">, <@", events.ActiveEvents[Index].Players.Select(x => x.UserId))}>", embed: BuildEvent(events.ActiveEvents[Index], Index));
         }
 
         [Command("leader")]
@@ -416,7 +426,7 @@ namespace MPA_Bot.Modules.Standard
                 Index *= -1;
             }
 
-            if (!EventStorage.ActiveEvents.ContainsKey(Index))
+            if (!events.ActiveEvents.ContainsKey(Index))
             {
                 await ReplyAsync($"There is no event in slot {Index.ToString("00")}!");
                 return;
@@ -426,17 +436,17 @@ namespace MPA_Bot.Modules.Standard
 
             if (mentions.Count() == 0)
             {
-                if (EventStorage.ActiveEvents[Index].Players.Count(x => x.Leader) == 0)
+                if (events.ActiveEvents[Index].Players.Count(x => x.Leader) == 0)
                 {
                     await ReplyAsync($"There are no leaders set for event {Index.ToString("00")}");
                     return;
                 }
                 else
                 {
-                    await ReplyAsync($"Removed <@{string.Join(">, <@", EventStorage.ActiveEvents[Index].Players.Where(x => x.Leader).Select(x => x.UserId))}>" +
-                        $"as leader{((EventStorage.ActiveEvents[Index].Players.Count(x => x.Leader) > 1) ? "s" : "")} for Event {Index.ToString("00")}");
+                    await ReplyAsync($"Removed <@{string.Join(">, <@", events.ActiveEvents[Index].Players.Where(x => x.Leader).Select(x => x.UserId))}>" +
+                        $"as leader{((events.ActiveEvents[Index].Players.Count(x => x.Leader) > 1) ? "s" : "")} for Event {Index.ToString("00")}");
 
-                    EventStorage.ActiveEvents[Index].ClearLeaders();
+                    events.ActiveEvents[Index].ClearLeaders();
 
                     return;
                 }
@@ -461,9 +471,9 @@ namespace MPA_Bot.Modules.Standard
             //    EventStorage.ActiveEvents[Index].Players.ForEach(x => x.RemoveLeader());
             //}
 
-            EventStorage.ActiveEvents[Index].SetLeaders(mentions);
+            events.ActiveEvents[Index].SetLeaders(mentions);
 
-            await ReplyAsync($"Set {string.Join(", ", mentions.Select(x => x.Mention))} as leader{((EventStorage.ActiveEvents[Index].Players.Count(x => x.Leader) > 1) ? "s" : "")} of Event {Index.ToString("00")}");
+            await ReplyAsync($"Set {string.Join(", ", mentions.Select(x => x.Mention))} as leader{((events.ActiveEvents[Index].Players.Count(x => x.Leader) > 1) ? "s" : "")} of Event {Index.ToString("00")}");
         }
 
         [Command("join")]
@@ -474,20 +484,20 @@ namespace MPA_Bot.Modules.Standard
                 Index *= -1;
             }
 
-            if (!EventStorage.ActiveEvents.ContainsKey(Index))
+            if (!events.ActiveEvents.ContainsKey(Index))
             {
                 await ReplyAsync($"There is no event in slot {Index.ToString("00")}!");
                 return;
             }
 
-            if (EventStorage.ActiveEvents[Index].ContainsPlayer(Context.User))
+            if (events.ActiveEvents[Index].ContainsPlayer(Context.User))
             {
                 await ReplyAsync($"You're already in event {Index.ToString("00")}!\n" +
                     $"You can leave with `>leave {Index.ToString("00")}` if you want.");
                 return;
             }
 
-            if (EventStorage.ActiveEvents[Index].AddPlayer(Context.User, Class))
+            if (events.ActiveEvents[Index].AddPlayer(Context.User, Class))
             {
                 StringBuilder output = new StringBuilder();
 
@@ -497,9 +507,9 @@ namespace MPA_Bot.Modules.Standard
                 output.AppendLine();
 
                 output.Append($"Players in event {Index.ToString("00")}: " +
-                    $"`{EventStorage.ActiveEvents[Index].Players.Count().ToString("00")}/" +
-                    $"{EventStorage.ActiveEvents[Index].MaxPlayers.ToString("00")}");
-                if (EventStorage.ActiveEvents[Index].Players.Count() >= EventStorage.ActiveEvents[Index].MaxPlayers)
+                    $"`{events.ActiveEvents[Index].Players.Count().ToString("00")}/" +
+                    $"{events.ActiveEvents[Index].MaxPlayers.ToString("00")}");
+                if (events.ActiveEvents[Index].Players.Count() >= events.ActiveEvents[Index].MaxPlayers)
                     output.Append(" [Full]`");
                 else
                     output.Append("`");
@@ -523,19 +533,19 @@ namespace MPA_Bot.Modules.Standard
                 Index *= -1;
             }
 
-            if (!EventStorage.ActiveEvents.ContainsKey(Index))
+            if (!events.ActiveEvents.ContainsKey(Index))
             {
                 await ReplyAsync($"There is no event in slot {Index.ToString("00")}!");
                 return;
             }
 
-            if (EventStorage.ActiveEvents[Index].ContainsPlayer(Name))
+            if (events.ActiveEvents[Index].ContainsPlayer(Name))
             {
                 await ReplyAsync($"They're already in event {Index.ToString("00")}!");
                 return;
             }
 
-            if (EventStorage.ActiveEvents[Index].AddPlayer(Name))
+            if (events.ActiveEvents[Index].AddPlayer(Name))
             {
                 StringBuilder output = new StringBuilder();
 
@@ -543,9 +553,9 @@ namespace MPA_Bot.Modules.Standard
                 output.AppendLine();
 
                 output.Append($"Players in event {Index.ToString("00")}: " +
-                    $"`{EventStorage.ActiveEvents[Index].Players.Count().ToString("00")}/" +
-                    $"{EventStorage.ActiveEvents[Index].MaxPlayers.ToString("00")}");
-                if (EventStorage.ActiveEvents[Index].Players.Count() >= EventStorage.ActiveEvents[Index].MaxPlayers)
+                    $"`{events.ActiveEvents[Index].Players.Count().ToString("00")}/" +
+                    $"{events.ActiveEvents[Index].MaxPlayers.ToString("00")}");
+                if (events.ActiveEvents[Index].Players.Count() >= events.ActiveEvents[Index].MaxPlayers)
                     output.Append(" [Full]`");
                 else
                     output.Append("`");
@@ -566,13 +576,13 @@ namespace MPA_Bot.Modules.Standard
                 Index *= -1;
             }
 
-            if (!EventStorage.ActiveEvents.ContainsKey(Index))
+            if (!events.ActiveEvents.ContainsKey(Index))
             {
                 await ReplyAsync($"There is no event in slot {Index.ToString("00")}!");
                 return;
             }
 
-            if (!EventStorage.ActiveEvents[Index].ContainsPlayer(Context.User))
+            if (!events.ActiveEvents[Index].ContainsPlayer(Context.User))
             {
                 await ReplyAsync($"*throws a rifle at {Context.User.Mention}*");
                 return;
@@ -580,7 +590,7 @@ namespace MPA_Bot.Modules.Standard
 
             if (Class == "")
             {
-                var player = EventStorage.ActiveEvents[Index].GetPlayer(Context.User);
+                var player = events.ActiveEvents[Index].GetPlayer(Context.User);
 
                 if (player.Class == "")
                     await ReplyAsync($"You haven't set a class, {Context.User.Mention}!");
@@ -590,7 +600,7 @@ namespace MPA_Bot.Modules.Standard
                 return;
             }
 
-            EventStorage.ActiveEvents[Index].SetClass(Context.User, Class);
+            events.ActiveEvents[Index].SetClass(Context.User, Class);
 
             await ReplyAsync($"{Context.User.Mention} your class in event {Index.ToString("00")} has been set to:\n{Class}");
         }
@@ -603,145 +613,18 @@ namespace MPA_Bot.Modules.Standard
                 Index *= -1;
             }
 
-            if (!EventStorage.ActiveEvents.ContainsKey(Index))
+            if (!events.ActiveEvents.ContainsKey(Index))
             {
                 await ReplyAsync($"There is no event in slot {Index.ToString("00")}!");
                 return;
             }
 
-            if (EventStorage.ActiveEvents[Index].RemovePlayer(Context.User))
+            if (events.ActiveEvents[Index].RemovePlayer(Context.User))
             {
                 await ReplyAsync($"{Context.User.Mention} left event {Index.ToString("00")}.");
             }
             else
                 await ReplyAsync($"*throws a rifle at {Context.User.Mention}*");
-        }
-    }
-
-    public class Event
-    {
-        public string Description;
-        public List<Player> Players = new List<Player>();
-        public int MaxPlayers = 12;
-        public int Block = 0;
-
-        public bool AddPlayer(IUser user, string className = "", bool leader = false)
-        {
-            if (Players.Count() >= MaxPlayers || ContainsPlayer(user))
-                return false;
-
-            Players.Add(new Player() { UserId = user.Id, Class = className, Leader = leader });
-
-            return true;
-        }
-
-        public bool AddPlayer(string name, string className = "", bool leader = false)
-        {
-            if (Players.Count() >= MaxPlayers || ContainsPlayer(name))
-                return false;
-
-            Players.Add(new Player() { PSOName = name, Class = className, Leader = leader });
-
-            return true;
-        }
-
-        public bool RemovePlayer(IUser user)
-        {
-            if (!ContainsPlayer(user))
-                return false;
-
-            var player = Players.FirstOrDefault(x => x.UserId == user.Id);
-            Players.Remove(player);
-            return true;
-        }
-
-        public bool RemovePlayer(string name)
-        {
-            if (!ContainsPlayer(name))
-                return false;
-
-            var player = Players.FirstOrDefault(x => x.PSOName.ToLower() == name.ToLower());
-            Players.Remove(player);
-            return true;
-        }
-
-        public Player GetPlayer(IUser user)
-        {
-            if (!ContainsPlayer(user))
-                return null;
-
-            var player = Players.FirstOrDefault(x => x.UserId == user.Id);
-            return player;
-        }
-
-        public Player GetPlayer(string name)
-        {
-            if (ContainsPlayer(name))
-                return null;
-
-            var player = Players.FirstOrDefault(x => x.PSOName.ToLower() == name.ToLower());
-            return player;
-        }
-
-        public void SetClass(IUser user, string className)
-        {
-            var player = Players.FirstOrDefault(x => x.UserId == user.Id);
-            player.SetClass(className);
-        }
-
-        public void SetClass(string name, string className)
-        {
-            var player = Players.FirstOrDefault(x => x.PSOName.ToLower() == name.ToLower());
-            player.SetClass(className);
-        }
-        
-        public bool ContainsPlayer(IUser user)
-        {
-            return Players.Select(x => x.UserId).Contains(user.Id);
-        }
-
-        public bool ContainsPlayer(string name)
-        {
-            return Players.Select(x => x.PSOName.ToLower()).Contains(name.ToLower());
-        }
-
-        public void SetLeaders(IEnumerable<IUser> users)
-        {
-            ClearLeaders();
-
-            foreach (var u in users)
-            {
-                GetPlayer(u).SetLeader();
-            }
-        }
-
-        public void ClearLeaders()
-        {
-            Players.ForEach(x => x.RemoveLeader());
-        }
-    }
-
-    public class Player
-    {
-        public ulong UserId;
-        public string PSOName = "";
-        public bool Discord = true;
-        public string Class;
-        public bool Leader = false;
-
-        public void SetClass(string className)
-        {
-            Class = className;
-        }
-
-        public void SetLeader()
-        {
-            Leader = true;
-        }
-
-        public void RemoveLeader()
-        {
-            Leader = false;
         }
     }
 }

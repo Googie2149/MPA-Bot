@@ -15,7 +15,7 @@ namespace MPA_Bot
         [JsonProperty("prefixes")]
         public IEnumerable<string> PrefixList { get; set; } = new[]
         {
-            ";"
+            ">"
         };
         [JsonProperty("mention_trigger")]
         public bool TriggerOnMention { get; set; } = true;

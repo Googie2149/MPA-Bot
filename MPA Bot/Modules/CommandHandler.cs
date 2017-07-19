@@ -20,6 +20,7 @@ namespace MPA_Bot
         //private IDependencyMap map;
         private IServiceProvider services;
         private Config config;
+        private EventStorage events;
 
         public async Task Install(IServiceProvider _services)
         {
@@ -29,6 +30,7 @@ namespace MPA_Bot
             //_map.Add(commands);
             services = _services;
             config = _services.GetService<Config>();
+            events = _services.GetService<EventStorage>();
 
             await commands.AddModulesAsync(Assembly.GetEntryAssembly());
 
@@ -53,9 +55,7 @@ namespace MPA_Bot
             var context = new CommandContext(client, message);
             // Execute the Command, store the result
             var result = await commands.ExecuteAsync(context, argPos, services);
-
-
-
+            
             // If the command failed, notify the user
             if (!result.IsSuccess)
             {

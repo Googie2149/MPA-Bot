@@ -91,10 +91,10 @@ namespace MPA_Bot
             else
                 text = msg.Message;
 
-            if (text.Contains("GUILD_UPDATE: ") && text.Contains("UTC"))
-                return Task.CompletedTask;
-            else if (text.StartsWith("CHANNEL_UPDATE: "))
-                return Task.CompletedTask;
+            //if (text.Contains("GUILD_UPDATE: ") && text.Contains("UTC"))
+            //    return Task.CompletedTask;
+            //else if (text.StartsWith("CHANNEL_UPDATE: "))
+            //    return Task.CompletedTask;
 
             if (sourceName == "Command")
                 color = ConsoleColor.Cyan;
@@ -126,11 +126,11 @@ namespace MPA_Bot
             }
 
             text = builder.ToString();
-            if (msg.Severity <= LogSeverity.Info)
-            {
+            //if (msg.Severity <= LogSeverity.Info)
+            //{
                 Console.ForegroundColor = color;
                 Console.WriteLine(text);
-            }
+            //}
 #if DEBUG
             System.Diagnostics.Debug.WriteLine(text);
 #endif

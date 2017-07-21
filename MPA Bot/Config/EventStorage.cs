@@ -84,7 +84,12 @@ namespace MPA_Bot
         public string Description;
         public List<Player> Players = new List<Player>();
         public int MaxPlayers = 12;
-        public int Block = 0;
+        public int Block = 201;
+        
+        public string HeadCount()
+        {
+            return $"{Players.Count().ToString("00")}/{MaxPlayers.ToString("00")}{((Players.Count() >= MaxPlayers) ? " [FULL]" : "")}";
+        }
 
         public bool AddPlayer(IUser user, string className = "", bool leader = false)
         {

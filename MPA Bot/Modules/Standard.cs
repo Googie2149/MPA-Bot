@@ -74,8 +74,7 @@ namespace MPA_Bot.Modules.Standard
                 $"# {buildEvent.Description}\n" +
                 "```\n" +
                 $"**Please try to be at the café {((buildEvent.Block != 0) ? $"in Block–{buildEvent.Block.ToString("000")} " : "")}10-15 minutes before the event starts.**\n" +
-                $"Players in Event {Index.ToString("00")}: **{buildEvent.Players.Count().ToString("00")}/{buildEvent.MaxPlayers.ToString("00")}**" +
-                $"{((buildEvent.Players.Count() >= buildEvent.MaxPlayers) ? " **[FULL]**" : "")}"
+                $"Players in Event {Index.ToString("00")}: **{buildEvent.HeadCount()}**"
                 );
 
             if (buildEvent.Players.Count() > 0)
@@ -110,7 +109,7 @@ namespace MPA_Bot.Modules.Standard
 
             embed.WithFooter(x =>
             {
-                x.Text = "Join: >join 1 [class]   |   Leave: >leave 1";
+                x.Text = $"Join: >join {Index.ToString("00")} [class]   |   Leave: >leave {Index.ToString("00")}";
             });
 
             return embed.Build();
@@ -157,7 +156,7 @@ namespace MPA_Bot.Modules.Standard
 
             return output.ToString();
         }
-
+        
         [Command("blah")]
         [Summary("Blah!")]
         [Priority(1000)]
@@ -238,9 +237,7 @@ namespace MPA_Bot.Modules.Standard
                 Environment.Exit(0);
             });
         }
-
         
-
         [Command("create")]
         public async Task CreateEvent(int Index, [Remainder]string Description)
         {
@@ -316,9 +313,7 @@ namespace MPA_Bot.Modules.Standard
                 output.AppendLine($"# Event {kv.Key.ToString("00")}");
                 output.AppendLine($"> {Trim(kv.Value.Description)}");
 
-                output.Append($"- {kv.Value.Players.Count().ToString("00")}/{kv.Value.MaxPlayers.ToString("00")}");
-                if (kv.Value.Players.Count() >= kv.Value.MaxPlayers)
-                    output.Append(" **[FULL]**");
+                output.Append($"- {kv.Value.HeadCount()}");
 
                 output.Append("\n\n");
             }
@@ -342,36 +337,6 @@ namespace MPA_Bot.Modules.Standard
                 return;
             }
 
-            //StringBuilder output = new StringBuilder();
-
-            //output.AppendLine($"**Event {Index.ToString("00")}**\n" +
-            //    $"{EventStorage.ActiveEvents[Index].Description}\n\n" +
-            //    $"Join: `>join {Index} [class]` | Leave: `>join {Index}`\n" +
-            //    $"Set/Edit Class: `>class {Index} [class]` or set it as you join.\n\n" +
-            //    $"Players in Event {Index.ToString("00")}: `{EventStorage.ActiveEvents[Index].Players.Count().ToString("00")}/{EventStorage.ActiveEvents[Index].MaxPlayers.ToString("00")}`");
-
-            //for (int i = 0; i < EventStorage.ActiveEvents[Index].Players.Count(); i++)
-            //{
-            //    var user = await Context.Guild.GetUserAsync(EventStorage.ActiveEvents[Index].Players[i].UserId);
-
-            //    output.Append($"`{(i + 1).ToString("00")}`");
-            //    if (EventStorage.ActiveEvents[Index].Players[i].Leader)
-            //        output.Append(" **- Leader**");
-            //    output.Append(" ");
-            //    if (user.Nickname != null)
-            //        output.Append(user.Nickname);
-            //    else
-            //        output.Append(user.Username);
-
-            //    if (EventStorage.ActiveEvents[Index].Players[i].Class != "")
-            //    {
-            //        output.Append(" | ");
-            //        output.AppendLine(EventStorage.ActiveEvents[Index].Players[i].Class);
-            //    }
-            //}
-
-            //await ReplyAsync(output.ToString());
-
             await ReplyAsync("", embed: BuildEvent(events.ActiveEvents[Index], Index));
         }
 
@@ -388,30 +353,6 @@ namespace MPA_Bot.Modules.Standard
                 await ReplyAsync($"There is no event in slot {Index.ToString("00")}!");
                 return;
             }
-
-            //StringBuilder output = new StringBuilder();
-
-            //output.AppendLine($"**Event {Index.ToString("00")}**\n" +
-            //    $"{EventStorage.ActiveEvents[Index].Description}\n");
-
-            //for (int i = 0; i < EventStorage.ActiveEvents[Index].Players.Count(); i++)
-            //{
-            //    var user = await Context.Guild.GetUserAsync(EventStorage.ActiveEvents[Index].Players[i].UserId);
-
-            //    output.Append($"`{(i + 1).ToString("00")}`");
-            //    if (EventStorage.ActiveEvents[Index].Players[i].Leader)
-            //        output.Append(" **- Leader**");
-            //    output.Append(" ");
-            //    output.Append(user.Mention);
-
-            //    if (EventStorage.ActiveEvents[Index].Players[i].Class != "")
-            //    {
-            //        output.Append(" | ");
-            //        output.AppendLine(EventStorage.ActiveEvents[Index].Players[i].Class);
-            //    }
-            //}
-
-            //await ReplyAsync(output.ToString());
 
             await ReplyAsync($"Calling all registered members:\n<@" +
                 $"{string.Join(">, <@", events.ActiveEvents[Index].Players.Select(x => x.UserId))}>", embed: BuildEvent(events.ActiveEvents[Index], Index));
@@ -507,12 +448,7 @@ namespace MPA_Bot.Modules.Standard
                 output.AppendLine();
 
                 output.Append($"Players in event {Index.ToString("00")}: " +
-                    $"`{events.ActiveEvents[Index].Players.Count().ToString("00")}/" +
-                    $"{events.ActiveEvents[Index].MaxPlayers.ToString("00")}");
-                if (events.ActiveEvents[Index].Players.Count() >= events.ActiveEvents[Index].MaxPlayers)
-                    output.Append(" [Full]`");
-                else
-                    output.Append("`");
+                    $"`{events.ActiveEvents[Index].HeadCount()}`");
 
                 if (Class == "")
                     output.Append($"\nRemember to use `>class {Index} [class]` to set your class!");
@@ -525,7 +461,7 @@ namespace MPA_Bot.Modules.Standard
             }
         }
 
-        //[Command("add")]
+        [Command("pso add")]
         public async Task ForceAdd(int Index, [Remainder]string Name)
         {
             if (Index < 0)
@@ -545,27 +481,7 @@ namespace MPA_Bot.Modules.Standard
                 return;
             }
 
-            if (events.ActiveEvents[Index].AddPlayer(Name))
-            {
-                StringBuilder output = new StringBuilder();
-
-                output.Append($"{Name} joined event {Index.ToString("00")}");
-                output.AppendLine();
-
-                output.Append($"Players in event {Index.ToString("00")}: " +
-                    $"`{events.ActiveEvents[Index].Players.Count().ToString("00")}/" +
-                    $"{events.ActiveEvents[Index].MaxPlayers.ToString("00")}");
-                if (events.ActiveEvents[Index].Players.Count() >= events.ActiveEvents[Index].MaxPlayers)
-                    output.Append(" [Full]`");
-                else
-                    output.Append("`");
-                
-                await ReplyAsync(output.ToString());
-            }
-            else
-            {
-                await ReplyAsync($"Sorry {Name}, Event {Index.ToString("00")} is full. ~~try to type faster next time~~");
-            }
+            
         }
 
         [Command("class")]
@@ -602,7 +518,7 @@ namespace MPA_Bot.Modules.Standard
 
             events.ActiveEvents[Index].SetClass(Context.User, Class);
 
-            await ReplyAsync($"{Context.User.Mention} your class in event {Index.ToString("00")} has been set to:\n{Class}");
+            await ReplyAsync($"{Context.User.Mention} your class in event {Index.ToString("00")} has been set to {Class}");
         }
 
         [Command("leave")]

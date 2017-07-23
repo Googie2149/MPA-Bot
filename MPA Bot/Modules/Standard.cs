@@ -133,7 +133,7 @@ namespace MPA_Bot.Modules.Standard
             return embed.Build();
         }
 
-        private Embed BuildTeam(Event buildEvent, int Index)
+        private Embed BuildParty(Event buildEvent, int Index)
         {
             var Builder = new EmbedBuilder();
 
@@ -150,32 +150,34 @@ namespace MPA_Bot.Modules.Standard
 
             for(int i = 0; i < leaders.Count(); i++)
             {
-                StringBuilder team = new StringBuilder();
+                StringBuilder party = new StringBuilder();
 
-                team.AppendLine(FormatSinglePlayer(leaders[i], 1));
+                party.AppendLine(FormatSinglePlayer(leaders[i], 1));
 
                 var players = shuffled.Skip(i * 3).Take(3).ToArray();
 
                 for (int p = 0; p < players.Length; p++)
                 {
-                    team.AppendLine(FormatSinglePlayer(players[p], p + 2));
+                    party.AppendLine(FormatSinglePlayer(players[p], p + 2));
                 }
 
                 embed
-                    .AddInlineField($"Team {(i + 1).ToString("00")}",
-                    team.ToString());
+                    .AddInlineField($"Party {(i + 1).ToString("00")}",
+                    party.ToString());
             }
 
             if ((leaders.Count() * 3) < shuffled.Count())
             {
-                StringBuilder team = new StringBuilder();
+                StringBuilder party = new StringBuilder();
                 var stragglers = shuffled.Skip(leaders.Count() * 3).ToArray();
+
                 for (int i = 0; i < stragglers.Length; i++)
                 {
-                    team.AppendLine(FormatSinglePlayer(stragglers[i], i + 1));
+                    party.AppendLine(FormatSinglePlayer(stragglers[i], i + 1));
                 }
-                team.Append("\nY'all get to fend for yourselves. Or you could just hang around the cafe. Either way.");
-                embed.AddInlineField("Stragglers", team.ToString());
+
+                party.Append("\nY'all get to fend for yourselves. Or you could just hang around the cafe. Either way.");
+                embed.AddInlineField("Stragglers", party.ToString());
             }
 
             return embed.Build();
@@ -426,9 +428,12 @@ namespace MPA_Bot.Modules.Standard
             }
 
             //await ReplyAsync($"Calling all registered members:\n<@" +
-              //  $"{string.Join(">, <@", events.ActiveEvents[Index].Players.Select(x => x.UserId))}>", embed: BuildEvent(events.ActiveEvents[Index], Index));
+            //    $"{string.Join(">, <@", events.ActiveEvents[Index].Players.Select(x => x.UserId))}>", embed: BuildEvent(events.ActiveEvents[Index], Index));
 
-            await ReplyAsync("", embed: BuildTeam(events.ActiveEvents[Index], Index));
+            if (events.ActiveEvents[Index].Players.Count(x => x.Leader) > 0)
+                await ReplyAsync("", embed: BuildParty(events.ActiveEvents[Index], Index));
+            else
+                await ReplyAsync("You don't have any party leads set!");
         }
 
         [Command("leader")]

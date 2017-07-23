@@ -22,6 +22,24 @@ namespace MPA_Bot.Modules.Standard
     //    public static Dictionary<int, Event> ActiveEvents = new Dictionary<int, Event>();
     //}
 
+    public static class Randomizer
+    {
+        private static Random rng = new Random();
+
+        public static void Shuffle<T>(this IList<T> list)
+        {
+            int n = list.Count;
+            while (n > 1)
+            {
+                n--;
+                int k = rng.Next(n + 1);
+                T value = list[k];
+                list[k] = list[n];
+                list[n] = value;
+            }
+        }
+    }
+
     public class Standard : ModuleBase
     {
         private EventStorage events;
@@ -115,6 +133,42 @@ namespace MPA_Bot.Modules.Standard
             return embed.Build();
         }
 
+        private Embed BuildTeam(Event buildEvent, int Index)
+        {
+            var Builder = new EmbedBuilder();
+
+            var embed = Builder
+                .WithColor(Color.Green)
+                .WithTitle($"Event {Index.ToString("00")} Teams");
+
+            var shuffled = new List<Player>(buildEvent.Players);
+            shuffled.Shuffle();
+
+            var leaders = shuffled.Where(x => x.Leader).ToList();
+
+            leaders.ForEach(x => shuffled.Remove(x));
+
+            for(int i = 0; i < leaders.Count(); i++)
+            {
+                StringBuilder team = new StringBuilder();
+
+                team.AppendLine(FormatSinglePlayer(leaders[i], 1));
+
+                var players = shuffled.Skip(i * 4).Take(3).ToArray();
+
+                for (int p = 0; p < players.Length; p++)
+                {
+                    team.AppendLine(FormatSinglePlayer(players[p], p + 2));
+                }
+
+                embed
+                    .AddInlineField($"Team {(i + 1).ToString("00")}",
+                    team.ToString());
+            }
+
+            return embed.Build();
+        }
+
         private string FormatPlayers(List<Player> players, int offset)
         {
             StringBuilder output = new StringBuilder();
@@ -124,35 +178,40 @@ namespace MPA_Bot.Modules.Standard
                 if (i > 0)
                     output.Append("\n");
 
-                var player = players[i];
-                string name = "";
-
-                if (player.PSOName == "")
-                {
-                    var user = ((SocketGuild)Context.Guild).GetUser(player.UserId);
-                    if (user.Nickname != null)
-                        name = user.Nickname;
-                    else
-                        name = user.Username;
-                }
-                else
-                    name = player.PSOName;
-
-                output.Append($"[`{(i + 1 + offset).ToString("00")} –`]() ");
-
-                if (player.Leader)
-                    output.Append("**");
-
-                output.Append(name);
-
-                if (player.Leader)
-                    output.Append("**");
-
-                output.Append("\n");
-
-                output.Append("[`>  –`]() ");
-                output.Append(player.Class);
+                output.Append(FormatSinglePlayer(players[i], i + 1 + offset));
             }
+
+            return output.ToString();
+        }
+
+        private string FormatSinglePlayer(Player player, int Index)
+        {
+            StringBuilder output = new StringBuilder();
+
+            string name = "";
+
+            if (player.PSOName == "")
+            {
+                var user = ((SocketGuild)Context.Guild).GetUser(player.UserId);
+                if (user.Nickname != null)
+                    name = user.Nickname;
+                else
+                    name = user.Username;
+            }
+            else
+                name = player.PSOName;
+
+            output.Append($"[`{Index.ToString("00")} –`]() ");
+
+            output.Append(name);
+
+            if (player.Leader)
+                output.Append(" - Party Lead");
+
+            output.Append("\n");
+
+            output.Append("[`>  –`]() ");
+            output.Append(player.Class);
 
             return output.ToString();
         }

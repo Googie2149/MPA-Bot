@@ -154,7 +154,7 @@ namespace MPA_Bot.Modules.Standard
 
                 team.AppendLine(FormatSinglePlayer(leaders[i], 1));
 
-                var players = shuffled.Skip(i * 4).Take(3).ToArray();
+                var players = shuffled.Skip(i * 3).Take(3).ToArray();
 
                 for (int p = 0; p < players.Length; p++)
                 {
@@ -164,6 +164,18 @@ namespace MPA_Bot.Modules.Standard
                 embed
                     .AddInlineField($"Team {(i + 1).ToString("00")}",
                     team.ToString());
+            }
+
+            if ((leaders.Count() * 3) < shuffled.Count())
+            {
+                StringBuilder team = new StringBuilder();
+                var stragglers = shuffled.Skip(leaders.Count() * 3).ToArray();
+                for (int i = 0; i < stragglers.Length; i++)
+                {
+                    team.AppendLine(FormatSinglePlayer(stragglers[i], i + 1));
+                }
+                team.Append("\nY'all get to fend for yourselves. Or you could just hang around the cafe. Either way.");
+                embed.AddInlineField("Stragglers", team.ToString());
             }
 
             return embed.Build();
@@ -413,8 +425,10 @@ namespace MPA_Bot.Modules.Standard
                 return;
             }
 
-            await ReplyAsync($"Calling all registered members:\n<@" +
-                $"{string.Join(">, <@", events.ActiveEvents[Index].Players.Select(x => x.UserId))}>", embed: BuildEvent(events.ActiveEvents[Index], Index));
+            //await ReplyAsync($"Calling all registered members:\n<@" +
+              //  $"{string.Join(">, <@", events.ActiveEvents[Index].Players.Select(x => x.UserId))}>", embed: BuildEvent(events.ActiveEvents[Index], Index));
+
+            await ReplyAsync("", embed: BuildTeam(events.ActiveEvents[Index], Index));
         }
 
         [Command("leader")]

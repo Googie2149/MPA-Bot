@@ -101,14 +101,9 @@ namespace MPA_Bot
             return true;
         }
 
-        public bool AddPlayer(string name, string className = "", bool leader = false)
+        public void AddPlayer(string name, string className = "", bool leader = false)
         {
-            if (Players.Count() >= MaxPlayers || ContainsPlayer(name))
-                return false;
-
             Players.Add(new Player() { PSOName = name, Class = className, Leader = leader });
-
-            return true;
         }
 
         public bool RemovePlayer(IUser user)
@@ -121,14 +116,10 @@ namespace MPA_Bot
             return true;
         }
 
-        public bool RemovePlayer(string name)
+        public void RemovePlayer(string name)
         {
-            if (!ContainsPlayer(name))
-                return false;
-
             var player = Players.FirstOrDefault(x => x.PSOName.ToLower() == name.ToLower());
             Players.Remove(player);
-            return true;
         }
 
         public Player GetPlayer(IUser user)
@@ -142,7 +133,7 @@ namespace MPA_Bot
 
         public Player GetPlayer(string name)
         {
-            if (ContainsPlayer(name))
+            if (ContainsPlayer(name) == false || ContainsPlayer(name) == null)
                 return null;
 
             var player = Players.FirstOrDefault(x => x.PSOName.ToLower() == name.ToLower());
@@ -166,9 +157,19 @@ namespace MPA_Bot
             return Players.Select(x => x.UserId).Contains(user.Id);
         }
 
-        public bool ContainsPlayer(string name)
+        public bool? ContainsPlayer(string name)
         {
-            return Players.Select(x => x.PSOName.ToLower()).Contains(name.ToLower());
+            var count = Players.Count(x => x.PSOName.ToLower() == name.ToLower());
+
+            switch (count)
+            {
+                case 0:
+                    return false;
+                case 1:
+                    return true;
+                default:
+                    return null;
+            }
         }
 
         public void SetLeaders(IEnumerable<IUser> users)

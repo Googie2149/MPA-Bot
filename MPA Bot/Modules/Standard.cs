@@ -349,6 +349,106 @@ namespace MPA_Bot.Modules.Standard
             await ReplyAsync($"{Context.User.Mention} created event {Index.ToString("00")}", embed: BuildEvent(events.ActiveEvents[Index], Index));
         }
 
+        [Command("edit")]
+        public async Task EditEvent(int Index, [Remainder]string Description)
+        {
+            if (Index < 0)
+            {
+                Index *= -1;
+            }
+
+            if (!events.ActiveEvents.ContainsKey(Index))
+            {
+                await ReplyAsync($"There is no event in slot {Index.ToString("00")}!");
+                return;
+            }
+
+            if (Description == "")
+            {
+                await ReplyAsync($"You can't set an empty description!");
+                return;
+            }
+
+            events.ActiveEvents[Index].Description = Description;
+            
+            await ReplyAsync($"Description for Event {Index.ToString("00")} changed to {Description}");
+        }
+
+        [Command("block")]
+        public async Task SetBlock(int Index, int Block = -8437)
+        {
+            if (Index < 0)
+            {
+                Index *= -1;
+            }
+
+            if (!events.ActiveEvents.ContainsKey(Index))
+            {
+                await ReplyAsync($"There is no event in slot {Index.ToString("00")}!");
+                return;
+            }
+
+            // magic numbers yayyyyy
+            if (Block == -8437)
+            {
+                await ReplyAsync($"Event {Index.ToString("00")} will meet in Block-{events.ActiveEvents[Index].Block.ToString("000")}.");
+                return;
+            }
+
+            // TODO: only allow actual blocks
+            
+            events.ActiveEvents[Index].Block = Block;
+
+            await ReplyAsync($"The meeting block for Event {Index.ToString("00")} has been changed to Block-{events.ActiveEvents[Index].Block.ToString("000")}.");
+        }
+
+        [Command("block")]
+        public async Task SetSize(int Index, int Size = -5797)
+        {
+            if (Index < 0)
+            {
+                Index *= -1;
+            }
+
+            if (!events.ActiveEvents.ContainsKey(Index))
+            {
+                await ReplyAsync($"There is no event in slot {Index.ToString("00")}!");
+                return;
+            }
+
+            // magic numbers yayyyyy
+            if (Size == -5797)
+            {
+                await ReplyAsync($"Event {Index.ToString("00")} will meet in Block-{events.ActiveEvents[Index].Block.ToString("000")}.");
+                return;
+            }
+
+            // TODO: only allow normal sizes
+            // TODO: point out players that no longer fit the size
+
+            if (Size > 12)
+            {
+                await ReplyAsync("You can't have more than 12 players in a MPA!");
+                return;
+            }
+
+            if (Size == 1)
+            {
+                await ReplyAsync("Yeah let's make an empty MPA, that's it.");
+                return;
+            }
+
+            if (Size < 0)
+            {
+                await ReplyAsync("Negative MPAs! That's how Sega has been hiding the 14*s!");
+                return;
+            }
+
+            events.ActiveEvents[Index].MaxPlayers = Size;
+
+            await ReplyAsync($"The player cap for Event {Index.ToString("00")} has been changed to `{Size}`.");
+        }
+
         [Command("close")]
         public async Task CloseEvent(int Index)
         {
@@ -539,28 +639,37 @@ namespace MPA_Bot.Modules.Standard
             }
         }
 
-        [Command("pso add")]
-        public async Task ForceAdd(int Index, [Remainder]string Name)
-        {
-            if (Index < 0)
-            {
-                Index *= -1;
-            }
+        //[Command("remove")]
+        //public async Task RemovePlayer(int Index, [Remainder]string Player = "")
+        //{
 
-            if (!events.ActiveEvents.ContainsKey(Index))
-            {
-                await ReplyAsync($"There is no event in slot {Index.ToString("00")}!");
-                return;
-            }
+        //}
 
-            if (events.ActiveEvents[Index].ContainsPlayer(Name))
-            {
-                await ReplyAsync($"They're already in event {Index.ToString("00")}!");
-                return;
-            }
+        //[Command("add")]
+        //public async Task ForceAdd(int Index, [Remainder]string Name)
+        //{
+        //    if (Index < 0)
+        //    {
+        //        Index *= -1;
+        //    }
 
+        //    if (!events.ActiveEvents.ContainsKey(Index))
+        //    {
+        //        await ReplyAsync($"There is no event in slot {Index.ToString("00")}!");
+        //        return;
+        //    }
+
+        //    if (events.ActiveEvents[Index].ContainsPlayer(Name) == true)
+        //    {
+        //        await ReplyAsync($"{Name} is already in event {Index.ToString("00")}!");
+        //        return;
+        //    }
+        //    else if (events.ActiveEvents[Index].ContainsPlayer(Name) == null)
+        //    {
+        //        await ReplyAsync($"");
+        //    }
             
-        }
+        //}
 
         [Command("class")]
         public async Task SetClass(int Index, [Remainder]string Class = "")

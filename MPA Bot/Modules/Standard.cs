@@ -402,7 +402,7 @@ namespace MPA_Bot.Modules.Standard
             await ReplyAsync($"The meeting block for Event {Index.ToString("00")} has been changed to Block-{events.ActiveEvents[Index].Block.ToString("000")}.");
         }
 
-        [Command("block")]
+        [Command("size")]
         public async Task SetSize(int Index, int Size = -5797)
         {
             if (Index < 0)

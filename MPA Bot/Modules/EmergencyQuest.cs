@@ -171,6 +171,7 @@ namespace MPA_Bot.Modules.PSO2
         [Command("broadcast")]
         public async Task ForceBroadcast()
         {
+            Console.WriteLine("Starting forced download");
             var request = (HttpWebRequest)WebRequest.Create("http://pso2.kaze.rip/eq/");
             request.Method = "GET";
             request.AllowReadStreamBuffering = false;
@@ -182,7 +183,18 @@ namespace MPA_Bot.Modules.PSO2
                     using (var reader = new StreamReader(responseStream))
                     {
                         var data = JsonConvert.DeserializeObject<List<EqList>>(await reader.ReadToEndAsync());
-                        
+
+                        Console.WriteLine("Data deserialized");
+
+                        if (data.ElementAt(0).Quests.All(x => x.Name == null))
+                            Console.WriteLine("ALL QUESTS ARE NULL IN EVENT 0");
+                        if (data.ElementAt(1).Quests.All(x => x.Name == null))
+                            Console.WriteLine("ALL QUESTS ARE NULL IN EVENT 1");
+                        if (data.ElementAt(2).Quests.All(x => x.Name == null))
+                            Console.WriteLine("ALL QUESTS ARE NULL IN EVENT 2");
+
+                        Console.WriteLine("Forcing broadcast");
+
                         service.Broadcast(data, true);
                     }
 

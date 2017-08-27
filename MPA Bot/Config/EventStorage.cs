@@ -12,7 +12,7 @@ using System.IO;
 using RestSharp;
 using Newtonsoft.Json;
 
-namespace MPA_Bot
+namespace MPA_Bot.Modules.PSO2
 {
     public class EventStorage
     {

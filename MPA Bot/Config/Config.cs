@@ -12,13 +12,18 @@ namespace MPA_Bot
     {
         [JsonProperty("token")]
         public string Token { get; set; }
+
         [JsonProperty("prefixes")]
         public IEnumerable<string> PrefixList { get; set; } = new[]
         {
             ">"
         };
+
         [JsonProperty("mention_trigger")]
         public bool TriggerOnMention { get; set; } = true;
+
+        [JsonProperty("server_settings")]
+        public Dictionary<ulong, EmergencyQuestConfig> ServerSettings = new Dictionary<ulong, EmergencyQuestConfig>();
 
         public static Config Load()
         {
@@ -38,5 +43,10 @@ namespace MPA_Bot
             //File.WriteAllText("config.json", json);
             JsonStorage.SerializeObjectToFile(this, "config.json").Wait();
         }
+    }
+
+    public class EmergencyQuestConfig
+    {
+        public Dictionary<ulong, List<int>> ChannelSettings = new Dictionary<ulong, List<int>>();
     }
 }

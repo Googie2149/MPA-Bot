@@ -8,6 +8,7 @@ using Discord.WebSocket;
 using Discord.Commands;
 using System.IO;
 using Microsoft.Extensions.DependencyInjection;
+using MPA_Bot.Modules.PSO2;
 
 namespace MPA_Bot
 {
@@ -20,6 +21,7 @@ namespace MPA_Bot
         private Config config;
         private EventStorage events;
         private CommandHandler handler;
+        private EmergencyQuestService eqService; 
 
         private async Task RunAsync()
         {
@@ -37,7 +39,12 @@ namespace MPA_Bot
 
             await client.LoginAsync(TokenType.Bot, config.Token);
             await client.StartAsync();
-            
+
+            eqService = new EmergencyQuestService();
+            await eqService.Install(map);
+
+           map = new ServiceCollection().AddSingleton(client).AddSingleton(config).AddSingleton(events).AddSingleton(eqService).BuildServiceProvider();
+
             handler = new CommandHandler();
             await handler.Install(map);
 

@@ -16,6 +16,7 @@
   <ItemGroup>
     <None Remove="config.json" />
     <None Remove="events.json" />
+    <None Remove="quests.json" />
   </ItemGroup>
 
   <ItemGroup>

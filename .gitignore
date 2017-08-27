@@ -12,6 +12,7 @@ config.json
 
 # Also don't need the events to be pushed
 events.json
+quests.json
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs

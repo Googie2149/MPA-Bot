@@ -9,6 +9,7 @@ using Discord.Commands.Builders;
 using Discord.WebSocket;
 using Discord.Addons.EmojiTools;
 using Microsoft.Extensions.DependencyInjection;
+using MPA_Bot.Modules.PSO2;
 //using Minitori.Modules.HelpModule;
 
 namespace MPA_Bot
@@ -21,6 +22,7 @@ namespace MPA_Bot
         private IServiceProvider services;
         private Config config;
         private EventStorage events;
+        private EmergencyQuestService service;
 
         public async Task Install(IServiceProvider _services)
         {
@@ -31,6 +33,7 @@ namespace MPA_Bot
             services = _services;
             config = _services.GetService<Config>();
             events = _services.GetService<EventStorage>();
+            service = _services.GetService<EmergencyQuestService>();
 
             await commands.AddModulesAsync(Assembly.GetEntryAssembly());
 

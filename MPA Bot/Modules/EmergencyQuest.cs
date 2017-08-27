@@ -26,7 +26,7 @@ namespace MPA_Bot.Modules.PSO2
             config = _config;
             service = _service;
         }
-
+        
         [Command("add")]
         [Priority(1000)]
         public async Task SetEQ(params int[] numbers)

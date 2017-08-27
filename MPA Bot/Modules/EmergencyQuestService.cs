@@ -148,7 +148,7 @@ namespace MPA_Bot.Modules.PSO2
 
                             StringBuilder output = new StringBuilder();
 
-                            output.AppendLine($"**Upcoming EQ in {(data.First().StartTime - DateTimeOffset.Now).Minutes} minutes!** ({data.First().StartTime.ToString("t")} JST)");
+                            output.AppendLine($"**Upcoming EQ in {(data.First().StartTime - DateTimeOffset.Now).Minutes} minutes!** ({data.First().StartTime.ToLocalTime().ToString("t")} EST)");
 
                             if (data.First().Quests.Count() == 10 && data.First().Quests.All(x => x.Name == data.First().Quests.First().Name))
                             {

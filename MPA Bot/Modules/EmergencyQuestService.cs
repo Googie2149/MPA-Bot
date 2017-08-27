@@ -212,9 +212,9 @@ namespace MPA_Bot.Modules.PSO2
         }
 
         [JsonIgnore]
-        public DateTimeOffset Time { get { return new DateTimeOffset(UnmanagedTime.Ticks, TimeZoneInfo.FindSystemTimeZoneById("Tokyo Standard Time").BaseUtcOffset); } }
+        public DateTimeOffset Time { get { return new DateTimeOffset(UnmanagedTime.Ticks, new TimeSpan(9, 0, 0)); } }
 
         [JsonIgnore]
-        public DateTimeOffset StartTime { get { return new DateTimeOffset(UnmanagedStartTime.Ticks, TimeZoneInfo.FindSystemTimeZoneById("Tokyo Standard Time").BaseUtcOffset); } }
+        public DateTimeOffset StartTime { get { return new DateTimeOffset(UnmanagedStartTime.Ticks, new TimeSpan(9, 0, 0)); } }
     }
 }

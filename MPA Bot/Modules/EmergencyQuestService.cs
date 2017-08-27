@@ -76,7 +76,7 @@ namespace MPA_Bot.Modules.PSO2
                     }
                     catch (Exception ex)
                     {
-
+                        Console.WriteLine($"{ex.Message}\n{ex.StackTrace}");
                     }
 
 

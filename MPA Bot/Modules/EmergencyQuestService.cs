@@ -30,6 +30,9 @@ namespace MPA_Bot.Modules.PSO2
             {
                 while (true)
                 {
+                    Console.WriteLine("Waiting for next attempt");
+                    await Task.Delay(1000 * 60 * 3);
+
                     try
                     {
                         if (config.ServerSettings.Count == 0)
@@ -75,12 +78,14 @@ namespace MPA_Bot.Modules.PSO2
 
                                     Console.WriteLine("Data deserialized");
 
-                                    if (data.ElementAt(0).Quests.All(x => x.Ship == 0))
-                                        Console.WriteLine("ALL QUESTS ARE NULL IN EVENT 0");
-                                    if (data.ElementAt(1).Quests.All(x => x.Ship == 0))
-                                        Console.WriteLine("ALL QUESTS ARE NULL IN EVENT 1");
-                                    if (data.ElementAt(2).Quests.All(x => x.Ship == 0))
-                                        Console.WriteLine("ALL QUESTS ARE NULL IN EVENT 2");
+                                    for (int i = 0; i < data.Count(); i++)
+                                    {
+                                        if (data[i].Quests.All(x => x.Ship == 0))
+                                            Console.WriteLine($"All ships are 0 in event {i}");
+                                    }
+
+                                    if (data.Count() == 0)
+                                        Console.WriteLine("Data is empty");
 
                                     Broadcast(data);
                                 }
@@ -92,9 +97,6 @@ namespace MPA_Bot.Modules.PSO2
                     {
                         Console.WriteLine($"{ex.Message}\n{ex.StackTrace ?? "No stack trace"}");
                     }
-
-                    Console.WriteLine("Waiting for next attempt");
-                    await Task.Delay(1000 * 60 * 3);
                 }
             });
         }
@@ -121,13 +123,13 @@ namespace MPA_Bot.Modules.PSO2
                     if (!force)
                         Console.WriteLine("New data!");
 
-                    foreach (var server in check.Select(x => x.Value.ChannelSettings))
+                    foreach (var server in check)
                     {
-                        Console.WriteLine("Server setting loop");
+                        Console.WriteLine($"Server setting loop {server.Key}");
 
-                        foreach (var setting in server)
+                        foreach (var setting in server.Value.ChannelSettings)
                         {
-                            Console.WriteLine("Channel setting loop");
+                            Console.WriteLine($"Channel setting loop {setting.Key}");
 
                             var channel = (ISocketMessageChannel)client.GetChannel(setting.Key);
                             if (channel == null)

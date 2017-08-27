@@ -77,6 +77,7 @@ namespace MPA_Bot
                         default:
                             await message.Channel.SendMessageAsync($"**Something went wrong:** `{result.ErrorReason}`\n" +
                                 $"Poke Googie2149#1368 about it if the reason doesn't make sense.");
+                            Console.WriteLine($"{result.ErrorReason}\n{result.Error.Value.ToString()}");
                             break;
                     }
                 }

@@ -185,13 +185,15 @@ namespace MPA_Bot.Modules.PSO2
                         var data = JsonConvert.DeserializeObject<List<EqList>>(await reader.ReadToEndAsync());
 
                         Console.WriteLine("Data deserialized");
+                        
+                        for (int i = 0; i < data.Count(); i++)
+                        {
+                            if (data[i].Quests.All(x => x.Ship == 0))
+                                Console.WriteLine($"All ships are 0 in event {i}");
+                        }
 
-                        if (data.ElementAt(0).Quests.All(x => x.Name == null))
-                            Console.WriteLine("ALL QUESTS ARE NULL IN EVENT 0");
-                        if (data.ElementAt(1).Quests.All(x => x.Name == null))
-                            Console.WriteLine("ALL QUESTS ARE NULL IN EVENT 1");
-                        if (data.ElementAt(2).Quests.All(x => x.Name == null))
-                            Console.WriteLine("ALL QUESTS ARE NULL IN EVENT 2");
+                        if (data.Count() == 0)
+                            Console.WriteLine("Data is empty");
 
                         Console.WriteLine("Forcing broadcast");
 

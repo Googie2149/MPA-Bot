@@ -47,9 +47,12 @@ namespace MPA_Bot.Modules.PSO2
                         foreach (var kv in check)
                         {
                             if (kv.Value.ChannelSettings.Values.All(x => x.Count() == 0))
+                            {
                                 remove.Add(kv.Key);
+                                Console.WriteLine($"Removing channel {kv.Key}");
+                            }
 
-                            Console.WriteLine($"Removing channel {kv.Key}");
+                            
                         }
 
                         if (remove.Count() > 0)

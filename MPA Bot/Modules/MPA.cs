@@ -141,8 +141,21 @@ namespace MPA_Bot.Modules.PSO2
                 .WithColor(Color.Green)
                 .WithTitle($"Event {Index.ToString("00")} Teams");
 
-            var shuffled = new List<Player>(buildEvent.Players);
-            shuffled.Shuffle();
+            if (buildEvent.Party.Count() == 0)
+            {
+                buildEvent.Party = new List<int>();
+                for (int i = 0; i < buildEvent.Players.Count(); i++)
+                {
+                    buildEvent.Party.Add(i + 1);
+                }
+                buildEvent.Party.Shuffle();
+            }
+
+            var shuffled = new List<Player>();
+            foreach (var i in buildEvent.Party)
+            {
+                shuffled.Add(buildEvent.Players[i]);
+            }
 
             var leaders = shuffled.Where(x => x.Leader).ToList();
 

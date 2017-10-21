@@ -85,7 +85,10 @@ namespace MPA_Bot.Modules.PSO2
         public List<Player> Players = new List<Player>();
         public int MaxPlayers = 12;
         public int Block = 201;
-        
+
+        [JsonIgnore]
+        public List<int> Party = new List<int>();
+
         public string HeadCount()
         {
             return $"{Players.Count().ToString("00")}/{MaxPlayers.ToString("00")}{((Players.Count() >= MaxPlayers) ? " [FULL]" : "")}";
@@ -97,6 +100,7 @@ namespace MPA_Bot.Modules.PSO2
                 return false;
 
             Players.Add(new Player() { UserId = user.Id, Class = className, Leader = leader });
+            Party.Clear();
 
             return true;
         }
@@ -104,6 +108,7 @@ namespace MPA_Bot.Modules.PSO2
         public void AddPlayer(string name, string className = "", bool leader = false)
         {
             Players.Add(new Player() { PSOName = name, Class = className, Leader = leader });
+            Party.Clear();
         }
 
         public bool RemovePlayer(IUser user)
@@ -113,6 +118,8 @@ namespace MPA_Bot.Modules.PSO2
 
             var player = Players.FirstOrDefault(x => x.UserId == user.Id);
             Players.Remove(player);
+            Party.Clear();
+
             return true;
         }
 
@@ -120,6 +127,7 @@ namespace MPA_Bot.Modules.PSO2
         {
             var player = Players.FirstOrDefault(x => x.PSOName.ToLower() == name.ToLower());
             Players.Remove(player);
+            Party.Clear();
         }
 
         public Player GetPlayer(IUser user)
@@ -128,6 +136,8 @@ namespace MPA_Bot.Modules.PSO2
                 return null;
 
             var player = Players.FirstOrDefault(x => x.UserId == user.Id);
+            Party.Clear();
+
             return player;
         }
 
@@ -185,6 +195,7 @@ namespace MPA_Bot.Modules.PSO2
         public void ClearLeaders()
         {
             Players.ForEach(x => x.RemoveLeader());
+            Party.Clear();
         }
     }
 

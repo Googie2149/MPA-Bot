@@ -215,9 +215,9 @@ namespace MPA_Bot.Modules.PSO2
         }
 
         [JsonIgnore]
-        public DateTimeOffset Time { get { return new DateTimeOffset(UnmanagedTime.Ticks, new TimeSpan(10, 0, 0)); } }
+        public DateTimeOffset Time { get { return new DateTimeOffset(UnmanagedTime.Ticks, new TimeSpan(0, 0, 0)); } }
 
         [JsonIgnore]
-        public DateTimeOffset StartTime { get { return new DateTimeOffset(UnmanagedStartTime.Ticks, new TimeSpan(10, 0, 0)); } }
+        public DateTimeOffset StartTime { get { return new DateTimeOffset(UnmanagedStartTime.Ticks, new TimeSpan(0, 0, 0)); } }
     }
 }

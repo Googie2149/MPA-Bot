@@ -160,7 +160,7 @@ namespace MPA_Bot.Modules.PSO2
                             else
                             {
                                 foreach (var shipQuest in eqs)
-                                    output.AppendLine($"`Ship {shipQuest.Ship.ToString("00")}:` {shipQuest.Name} ({shipQuest.JpName})");
+                                    output.AppendLine($"`Ship {shipQuest.Ship.ToString("00")}:` {shipQuest.Name}{((shipQuest.Name != shipQuest.JpName) ? $" ({shipQuest.JpName})" : "")}");
                             }
 
                             Console.WriteLine(output.ToString());

@@ -70,7 +70,7 @@ namespace MPA_Bot.Modules.PSO2
                     catch (Exception ex)
                     {
                         // add logging pls
-                        Console.WriteLine("Error saving!");
+                        Console.WriteLine($"Error saving!\n{ex.Message}\n{ex.Source}");
                     }
 
                     await Task.Delay(1000 * 60);

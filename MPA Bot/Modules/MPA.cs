@@ -117,12 +117,13 @@ namespace MPA_Bot.Modules.PSO2
                     secondEnd = buildEvent.Players.Count();
                 }
 
-                Builder.AddInlineField($"Players 01–{firstEnd.ToString("00")}",
-                    FormatPlayers(buildEvent.Players.Take(firstEnd).ToList(), 0));
+                Builder.AddField($"Players 01–{firstEnd.ToString("00")}",
+                    FormatPlayers(buildEvent.Players.Take(firstEnd).ToList(), 0), inline: true);
+                // Extra verbosity isn't *required* but hell if I'll remember what that 'true' means in 6 months
                 
                 if (secondField)
-                    Builder.AddInlineField($"Players {secondStart.ToString("00")}–{secondEnd.ToString("00")}",
-                    FormatPlayers(buildEvent.Players.Skip(firstEnd).ToList(), firstEnd));
+                    Builder.AddField($"Players {secondStart.ToString("00")}–{secondEnd.ToString("00")}",
+                    FormatPlayers(buildEvent.Players.Skip(firstEnd).ToList(), firstEnd), inline: true);
             }
 
             embed.WithFooter(x =>
@@ -175,8 +176,8 @@ namespace MPA_Bot.Modules.PSO2
                 }
 
                 embed
-                    .AddInlineField($"Party {(i + 1).ToString("00")}",
-                    party.ToString());
+                    .AddField($"Party {(i + 1).ToString("00")}",
+                    party.ToString(), inline: true);
             }
 
             if ((leaders.Count() * 3) < shuffled.Count())
@@ -190,7 +191,7 @@ namespace MPA_Bot.Modules.PSO2
                 }
 
                 party.Append("\nY'all get to fend for yourselves. Or you could just hang around the cafe. Either way.");
-                embed.AddInlineField("Stragglers", party.ToString());
+                embed.AddField("Stragglers", party.ToString(), inline: true);
             }
 
             return embed.Build();

@@ -608,11 +608,61 @@ namespace MPA_Bot.Modules.PSO2
             }
         }
 
-        //[Command("remove")]
-        //public async Task RemovePlayer(int Index, [Remainder]string Player = "")
-        //{
+        [Command("remove")]
+        public async Task RemovePlayer(int Index, [Remainder]string Player = "")
+        {
+            if (Index < 0)
+            {
+                Index *= -1;
+            }
 
-        //}
+            if (!events.ActiveEvents.ContainsKey(Index))
+            {
+                await ReplyAsync($"There is no event in slot {Index.ToString("00")}!");
+                return;
+            }
+
+            if (!(Context.User.Id != events.ActiveEvents[Index].Creator || ((IGuildUser)Context.User).RoleIds.Contains(ManagerRole)))
+            {
+                await ReplyAsync("You don't have permission to edit that event!");
+                return;
+            }
+
+            var mentions = ((SocketUserMessage)Context.Message).MentionedUsers.ToList();
+
+            if (mentions.Count() == 0)
+            {
+                await ReplyAsync("You need to mention someone!");
+                return;
+            }
+
+            List<string> removedNames = new List<string>();
+
+            foreach (var m in mentions)
+            {
+                if (events.ActiveEvents[Index].RemovePlayer(m))
+                {
+                    removedNames.Add(((SocketGuildUser)m).Nickname != null ? ((SocketGuildUser)m).Nickname : ((SocketGuildUser)m).Username);
+                }
+            }
+
+            if (mentions.Count() == 1)
+            {
+                if (removedNames.Count() == 0)
+                    await ReplyAsync($"That player isn't in event {Index.ToString("00")}!");
+                else
+                    await ReplyAsync($"Removed {removedNames.FirstOrDefault()} from event {Index.ToString("00")}.");
+            }
+            else if (mentions.Count() > 1)
+            {
+                if (removedNames.Count() == 0)
+                    await ReplyAsync($"None of those players are in event {Index.ToString("00")}!");
+                else
+                    await ReplyAsync($"Removed {string.Join(", ", removedNames.Take(removedNames.Count() - 1))}" +
+                        $"{(removedNames.Count() > 2 ? "," : "")} " +
+                        $"and {removedNames.LastOrDefault()} from event {Index.ToString("00")}.");
+            }
+        }
 
         //[Command("add")]
         //public async Task ForceAdd(int Index, [Remainder]string Name)
@@ -637,7 +687,7 @@ namespace MPA_Bot.Modules.PSO2
         //    {
         //        await ReplyAsync($"");
         //    }
-            
+
         //}
 
         [Command("class")]

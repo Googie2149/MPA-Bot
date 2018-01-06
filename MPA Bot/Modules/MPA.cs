@@ -43,6 +43,10 @@ namespace MPA_Bot.Modules.PSO2
     public class MPAs : ModuleBase
     {
         private EventStorage events;
+        private readonly ulong ManagerRole = 350506587879636993;
+
+        // yay now it really is locked to just one server.
+        // This role is used for adding/removing players and editing events
 
         public MPAs(EventStorage _events)
         {
@@ -267,6 +271,7 @@ namespace MPA_Bot.Modules.PSO2
             }
 
             var tempEvent = new Event() { Description = Description };
+            tempEvent.Creator = Context.User.Id;
 
             if (ownerJoining)
                 tempEvent.AddPlayer(Context.User, "");
@@ -283,6 +288,7 @@ namespace MPA_Bot.Modules.PSO2
         }
 
         [Command("edit")]
+        
         public async Task EditEvent(int Index, [Remainder]string Description)
         {
             if (Index < 0)
@@ -293,6 +299,12 @@ namespace MPA_Bot.Modules.PSO2
             if (!events.ActiveEvents.ContainsKey(Index))
             {
                 await ReplyAsync($"There is no event in slot {Index.ToString("00")}!");
+                return;
+            }
+
+            if (!(Context.User.Id != events.ActiveEvents[Index].Creator || ((IGuildUser)Context.User).RoleIds.Contains(ManagerRole)))
+            {
+                await ReplyAsync("You don't have permission to edit that event!");
                 return;
             }
 
@@ -321,6 +333,12 @@ namespace MPA_Bot.Modules.PSO2
                 return;
             }
 
+            if (!(Context.User.Id != events.ActiveEvents[Index].Creator || ((IGuildUser)Context.User).RoleIds.Contains(ManagerRole)))
+            {
+                await ReplyAsync("You don't have permission to edit that event!");
+                return;
+            }
+
             // magic numbers yayyyyy
             if (Block == -8437)
             {
@@ -346,6 +364,12 @@ namespace MPA_Bot.Modules.PSO2
             if (!events.ActiveEvents.ContainsKey(Index))
             {
                 await ReplyAsync($"There is no event in slot {Index.ToString("00")}!");
+                return;
+            }
+
+            if (!(Context.User.Id != events.ActiveEvents[Index].Creator || ((IGuildUser)Context.User).RoleIds.Contains(ManagerRole)))
+            {
+                await ReplyAsync("You don't have permission to edit that event!");
                 return;
             }
 
@@ -393,6 +417,12 @@ namespace MPA_Bot.Modules.PSO2
             if (!events.ActiveEvents.ContainsKey(Index))
             {
                 await ReplyAsync($"There is no event in slot {Index.ToString("00")}!");
+                return;
+            }
+
+            if (!(Context.User.Id != events.ActiveEvents[Index].Creator || ((IGuildUser)Context.User).RoleIds.Contains(ManagerRole)))
+            {
+                await ReplyAsync("You don't have permission to edit that event!");
                 return;
             }
 
@@ -481,6 +511,12 @@ namespace MPA_Bot.Modules.PSO2
             if (!events.ActiveEvents.ContainsKey(Index))
             {
                 await ReplyAsync($"There is no event in slot {Index.ToString("00")}!");
+                return;
+            }
+
+            if (!(Context.User.Id != events.ActiveEvents[Index].Creator || ((IGuildUser)Context.User).RoleIds.Contains(ManagerRole)))
+            {
+                await ReplyAsync("You don't have permission to edit that event!");
                 return;
             }
 

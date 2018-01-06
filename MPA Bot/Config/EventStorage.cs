@@ -85,6 +85,7 @@ namespace MPA_Bot.Modules.PSO2
         public List<Player> Players = new List<Player>();
         public int MaxPlayers = 12;
         public int Block = 201;
+        public ulong Creator = 0;
 
         [JsonIgnore]
         public List<int> Party = new List<int>();

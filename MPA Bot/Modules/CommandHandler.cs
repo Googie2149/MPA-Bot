@@ -55,7 +55,7 @@ namespace MPA_Bot
             if (!ParseTriggers(message, ref argPos)) return;
 
             // Create a Command Context
-            var context = new CommandContext(client, message);
+            var context = new MPAContext(client, message);
             // Execute the Command, store the result
             var result = await commands.ExecuteAsync(context, argPos, services);
             

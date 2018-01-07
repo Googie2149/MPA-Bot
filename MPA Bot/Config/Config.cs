@@ -25,6 +25,9 @@ namespace MPA_Bot
         [JsonProperty("server_settings")]
         public Dictionary<ulong, EmergencyQuestConfig> ServerSettings = new Dictionary<ulong, EmergencyQuestConfig>();
 
+        [JsonProperty("success_response")]
+        public string SuccessResponse { get; set; } = ":thumbsup:";
+
         public static Config Load()
         {
             if (File.Exists("config.json"))

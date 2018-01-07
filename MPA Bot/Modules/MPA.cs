@@ -53,7 +53,7 @@ namespace MPA_Bot.Modules.PSO2
             events = _events;
         }
 
-        private async Task<bool> CheckPermissions(int Index, bool ModRequired = false, bool PartyLeadRequired = false)
+        private async Task<bool> CheckPermissions(int Index, bool ModRequired = false)
         {
             if (!events.ActiveEvents.ContainsKey(Index))
             {
@@ -450,11 +450,8 @@ namespace MPA_Bot.Modules.PSO2
                 Index *= -1;
             }
 
-            if (!events.ActiveEvents.ContainsKey(Index))
-            {
-                await ReplyAsync($"There is no event in slot {Index.ToString("00")}!");
+            if (!await CheckPermissions(Index))
                 return;
-            }
 
             await ReplyAsync("", embed: BuildEvent(events.ActiveEvents[Index], Index));
         }
@@ -543,11 +540,8 @@ namespace MPA_Bot.Modules.PSO2
                 Index *= -1;
             }
 
-            if (!events.ActiveEvents.ContainsKey(Index))
-            {
-                await ReplyAsync($"There is no event in slot {Index.ToString("00")}!");
+            if (!await CheckPermissions(Index))
                 return;
-            }
 
             if (events.ActiveEvents[Index].ContainsPlayer(Context.User))
             {
@@ -673,32 +667,6 @@ namespace MPA_Bot.Modules.PSO2
             }
         }
 
-        //[Command("add")]
-        //public async Task ForceAdd(int Index, [Remainder]string Name)
-        //{
-        //    if (Index < 0)
-        //    {
-        //        Index *= -1;
-        //    }
-
-        //    if (!events.ActiveEvents.ContainsKey(Index))
-        //    {
-        //        await ReplyAsync($"There is no event in slot {Index.ToString("00")}!");
-        //        return;
-        //    }
-
-        //    if (events.ActiveEvents[Index].ContainsPlayer(Name) == true)
-        //    {
-        //        await ReplyAsync($"{Name} is already in event {Index.ToString("00")}!");
-        //        return;
-        //    }
-        //    else if (events.ActiveEvents[Index].ContainsPlayer(Name) == null)
-        //    {
-        //        await ReplyAsync($"");
-        //    }
-
-        //}
-
         [Command("class")]
         public async Task SetClass(int Index, [Remainder]string Class = "")
         {
@@ -707,11 +675,8 @@ namespace MPA_Bot.Modules.PSO2
                 Index *= -1;
             }
 
-            if (!events.ActiveEvents.ContainsKey(Index))
-            {
-                await ReplyAsync($"There is no event in slot {Index.ToString("00")}!");
+            if (!await CheckPermissions(Index))
                 return;
-            }
 
             if (!events.ActiveEvents[Index].ContainsPlayer(Context.User))
             {
@@ -744,11 +709,8 @@ namespace MPA_Bot.Modules.PSO2
                 Index *= -1;
             }
 
-            if (!events.ActiveEvents.ContainsKey(Index))
-            {
-                await ReplyAsync($"There is no event in slot {Index.ToString("00")}!");
+            if (!await CheckPermissions(Index))
                 return;
-            }
 
             if (events.ActiveEvents[Index].RemovePlayer(Context.User))
             {

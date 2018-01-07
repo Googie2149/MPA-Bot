@@ -302,7 +302,7 @@ namespace MPA_Bot.Modules.PSO2
                 return;
             }
 
-            if (!(Context.User.Id != events.ActiveEvents[Index].Creator || ((IGuildUser)Context.User).RoleIds.Contains(ManagerRole)))
+            if (!(Context.User.Id == events.ActiveEvents[Index].Creator || ((IGuildUser)Context.User).RoleIds.Contains(ManagerRole)))
             {
                 await ReplyAsync("You don't have permission to edit that event!");
                 return;
@@ -333,7 +333,7 @@ namespace MPA_Bot.Modules.PSO2
                 return;
             }
 
-            if (!(Context.User.Id != events.ActiveEvents[Index].Creator || ((IGuildUser)Context.User).RoleIds.Contains(ManagerRole)))
+            if (!(Context.User.Id == events.ActiveEvents[Index].Creator || ((IGuildUser)Context.User).RoleIds.Contains(ManagerRole)))
             {
                 await ReplyAsync("You don't have permission to edit that event!");
                 return;
@@ -367,7 +367,7 @@ namespace MPA_Bot.Modules.PSO2
                 return;
             }
 
-            if (!(Context.User.Id != events.ActiveEvents[Index].Creator || ((IGuildUser)Context.User).RoleIds.Contains(ManagerRole)))
+            if (!(Context.User.Id == events.ActiveEvents[Index].Creator || ((IGuildUser)Context.User).RoleIds.Contains(ManagerRole)))
             {
                 await ReplyAsync("You don't have permission to edit that event!");
                 return;
@@ -420,7 +420,7 @@ namespace MPA_Bot.Modules.PSO2
                 return;
             }
 
-            if (!(Context.User.Id != events.ActiveEvents[Index].Creator || ((IGuildUser)Context.User).RoleIds.Contains(ManagerRole)))
+            if (!(Context.User.Id == events.ActiveEvents[Index].Creator || ((IGuildUser)Context.User).RoleIds.Contains(ManagerRole)))
             {
                 await ReplyAsync("You don't have permission to edit that event!");
                 return;
@@ -514,7 +514,7 @@ namespace MPA_Bot.Modules.PSO2
                 return;
             }
 
-            if (!(Context.User.Id != events.ActiveEvents[Index].Creator || ((IGuildUser)Context.User).RoleIds.Contains(ManagerRole)))
+            if (!(Context.User.Id == events.ActiveEvents[Index].Creator || ((IGuildUser)Context.User).RoleIds.Contains(ManagerRole)))
             {
                 await ReplyAsync("You don't have permission to edit that event!");
                 return;
@@ -622,7 +622,7 @@ namespace MPA_Bot.Modules.PSO2
                 return;
             }
 
-            if (!(Context.User.Id != events.ActiveEvents[Index].Creator || ((IGuildUser)Context.User).RoleIds.Contains(ManagerRole)))
+            if (!(Context.User.Id == events.ActiveEvents[Index].Creator || ((IGuildUser)Context.User).RoleIds.Contains(ManagerRole)))
             {
                 await ReplyAsync("You don't have permission to edit that event!");
                 return;

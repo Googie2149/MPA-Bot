@@ -28,16 +28,18 @@ namespace MPA_Bot.Modules.PSO2
 
             Task.Run(async () =>
             {
+                int connectionFailure = 0;
+
                 while (true)
                 {
-                    Console.WriteLine("Waiting for next attempt");
+                    //Console.WriteLine("Waiting for next attempt");
                     await Task.Delay(1000 * 60 * 3);
 
                     try
                     {
                         if (config.ServerSettings.Count == 0)
                         {
-                            Console.WriteLine("List is empty, skipping");
+                            //Console.WriteLine("List is empty, skipping");
                             continue;
                         }
 
@@ -49,7 +51,7 @@ namespace MPA_Bot.Modules.PSO2
                             if (kv.Value.ChannelSettings.Values.All(x => x.Count() == 0))
                             {
                                 remove.Add(kv.Key);
-                                Console.WriteLine($"Removing channel {kv.Key}");
+                                //Console.WriteLine($"Removing channel {kv.Key}");
                             }
 
                             
@@ -57,7 +59,7 @@ namespace MPA_Bot.Modules.PSO2
 
                         if (remove.Count() > 0)
                         {
-                            Console.WriteLine("Writing changes");
+                            //Console.WriteLine("Writing changes");
 
                             foreach (var r in remove)
                                 check.Remove(r);
@@ -66,7 +68,7 @@ namespace MPA_Bot.Modules.PSO2
                             config.Save();
                         }
 
-                        Console.WriteLine("Starting automated download");
+                        //Console.WriteLine("Starting automated download");
                         var request = (HttpWebRequest)WebRequest.Create("http://pso2.kaze.rip/eq/");
                         request.Method = "GET";
                         request.AllowReadStreamBuffering = false;
@@ -79,16 +81,19 @@ namespace MPA_Bot.Modules.PSO2
                                 {
                                     var data = JsonConvert.DeserializeObject<List<EqList>>(await reader.ReadToEndAsync());
 
-                                    Console.WriteLine("Data deserialized");
+                                    //Console.WriteLine("Data deserialized");
 
-                                    for (int i = 0; i < data.Count(); i++)
-                                    {
-                                        if (data[i].Quests.All(x => x.Ship == 0))
-                                            Console.WriteLine($"All ships are 0 in event {i}");
-                                    }
+                                    //for (int i = 0; i < data.Count(); i++)
+                                    //{
+                                    //    if (data[i].Quests.All(x => x.Ship == 0))
+                                    //        Console.WriteLine($"All ships are 0 in event {i}");
+                                    //}
 
-                                    if (data.Count() == 0)
-                                        Console.WriteLine("Data is empty");
+                                    //if (data.Count() == 0)
+                                    //    Console.WriteLine("Data is empty");
+
+                                    connectionFailure = 0;
+                                    // Probably gonna regret putting this in so low.
 
                                     Broadcast(data);
                                 }
@@ -98,7 +103,13 @@ namespace MPA_Bot.Modules.PSO2
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"{ex.Message}\n{ex.StackTrace ?? "No stack trace"}");
+                        Console.WriteLine($"Error while downloading data!\n{ex.Message}\n{ex.StackTrace ?? "No stack trace"}");
+
+                        await Task.Delay(1000 * 60 + ((1000 * 15) * connectionFailure));
+                        
+                        if (connectionFailure < 36)
+                            connectionFailure++;
+                        // if I don't suck at math, hopefully that caps out at an additional 10 minutes before retrying on an error.
                     }
                 }
             });
@@ -112,32 +123,32 @@ namespace MPA_Bot.Modules.PSO2
 
                 if (!File.Exists("quests.json"))
                 {
-                    Console.WriteLine("Creating cache");
+                    //Console.WriteLine("Creating cache");
                     JsonStorage.SerializeObjectToFile(data, "quests.json");
-                    Console.WriteLine("Created cache; returning...");
+                    //Console.WriteLine("Created cache; returning...");
                     return;
                 }
 
-                Console.WriteLine("Reading cache...");
+                //Console.WriteLine("Reading cache...");
                 var cache = JsonStorage.DeserializeObjectFromFile<List<EqList>>("quests.json");
 
                 if (data.First().Time != cache.First().Time || force)
                 {
-                    if (!force)
-                        Console.WriteLine("New data!");
+                    //if (!force)
+                    //    Console.WriteLine("New data!");
 
                     foreach (var server in check)
                     {
-                        Console.WriteLine($"Server setting loop {server.Key}");
+                        //Console.WriteLine($"Server setting loop {server.Key}");
 
                         foreach (var setting in server.Value.ChannelSettings)
                         {
-                            Console.WriteLine($"Channel setting loop {setting.Key}");
+                            //Console.WriteLine($"Channel setting loop {setting.Key}");
 
                             var channel = (ISocketMessageChannel)client.GetChannel(setting.Key);
                             if (channel == null)
                             {
-                                Console.WriteLine("null channel");
+                                //Console.WriteLine("null channel");
                                 continue; // TODO: MARK CHANNEL FOR REMOVAL
                             }
 
@@ -145,7 +156,7 @@ namespace MPA_Bot.Modules.PSO2
 
                             if (eqs.Count() == 0)
                             {
-                                Console.WriteLine("No matched ships");
+                                //Console.WriteLine("No matched ships");
                                 continue;
                             }
 
@@ -171,23 +182,23 @@ namespace MPA_Bot.Modules.PSO2
 
                     if (data.First().Time != cache.First().Time)
                     {
-                        Console.WriteLine("Updating cache...");
+                        //Console.WriteLine("Updating cache...");
                         JsonStorage.SerializeObjectToFile(data, "quests.json");
-                        Console.WriteLine("Cache updated");
+                        //Console.WriteLine("Cache updated");
                     }
                 }
-                else
-                {
-                    if (!force)
-                        Console.WriteLine("Time is matched with cache, skipping");
-                }
+                //else
+                //{
+                //    if (!force)
+                //        Console.WriteLine("Time is matched with cache, skipping");
+                //}
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"{ex.Message}\n{ex.StackTrace ?? "No stack trace"}");
+                Console.WriteLine($"Error while sending broadcast!\n{ex.Message}\n{ex.StackTrace ?? "No stack trace"}");
             }
 
-            Console.WriteLine("Returnning to previous context");
+            //Console.WriteLine("Returnning to previous context");
         }
     }
 

@@ -40,7 +40,8 @@ namespace MPA_Bot.Modules.PSO2
         }
     }
     
-    public class MPAs : ModuleBase
+    [RequireContext(ContextType.Guild)]
+    public class MPAs : MPAModule
     {
         private EventStorage events;
         private readonly ulong ManagerRole = 350506587879636993;
@@ -57,7 +58,7 @@ namespace MPA_Bot.Modules.PSO2
         {
             if (!events.ActiveEvents.ContainsKey(Index))
             {
-                await ReplyAsync($"There is no event in slot {Index.ToString("00")}!");
+                await RespondAsync($"There is no event in slot {Index.ToString("00")}!");
                 return false;
             }
 
@@ -66,7 +67,7 @@ namespace MPA_Bot.Modules.PSO2
                 ((IGuildUser)Context.User).RoleIds.Contains(ManagerRole))
                 )
             {
-                await ReplyAsync("You don't have permission to edit that event!");
+                await RespondAsync("You don't have permission to edit that event!");
                 return false;
             }
 
@@ -280,13 +281,13 @@ namespace MPA_Bot.Modules.PSO2
 
             if (Index > 99)
             {
-                await ReplyAsync($"You can't go higher than 99. Why? I dunno ¯\\\\\\_(ツ)_/¯");
+                await RespondAsync($"You can't go higher than 99. Why? I dunno ¯\\\\\\_(ツ)_/¯");
                 return;
             }
 
             if (events.ActiveEvents.ContainsKey(Index))
             {
-                await ReplyAsync($"There's already an event running in slot {Index.ToString("00")}!");
+                await RespondAsync($"There's already an event running in slot {Index.ToString("00")}!");
                 return;
             }
 
@@ -298,7 +299,7 @@ namespace MPA_Bot.Modules.PSO2
 
             events.ActiveEvents.Add(Index, tempEvent);
 
-            //await ReplyAsync($"{Context.User.Mention} created event {Index.ToString("00")}\n" +
+            //await RespondAsync($"{Context.User.Mention} created event {Index.ToString("00")}\n" +
             //    $"{tempEvent.Description}\n" +
             //    $"Join: `>join {Index} [class]` | Leave: `>join {Index}`\n" +
             //    $"Set/Edit Class: `>class {Index} [class]` or set it as you join.\n" +
@@ -320,13 +321,13 @@ namespace MPA_Bot.Modules.PSO2
 
             if (Description == "")
             {
-                await ReplyAsync($"You can't set an empty description!");
+                await RespondAsync($"You can't set an empty description!");
                 return;
             }
 
             events.ActiveEvents[Index].Description = Description;
             
-            await ReplyAsync($"Description for Event {Index.ToString("00")} changed to {Description}");
+            await RespondAsync($"Description for Event {Index.ToString("00")} changed to {Description}");
         }
 
         [Command("block")]
@@ -343,7 +344,7 @@ namespace MPA_Bot.Modules.PSO2
             // magic numbers yayyyyy
             if (Block == -8437)
             {
-                await ReplyAsync($"Event {Index.ToString("00")} will meet in Block-{events.ActiveEvents[Index].Block.ToString("000")}.");
+                await RespondAsync($"Event {Index.ToString("00")} will meet in Block-{events.ActiveEvents[Index].Block.ToString("000")}.");
                 return;
             }
 
@@ -351,7 +352,7 @@ namespace MPA_Bot.Modules.PSO2
             
             events.ActiveEvents[Index].Block = Block;
 
-            await ReplyAsync($"The meeting block for Event {Index.ToString("00")} has been changed to Block-{events.ActiveEvents[Index].Block.ToString("000")}.");
+            await RespondAsync($"The meeting block for Event {Index.ToString("00")} has been changed to Block-{events.ActiveEvents[Index].Block.ToString("000")}.");
         }
 
         [Command("size")]
@@ -368,7 +369,7 @@ namespace MPA_Bot.Modules.PSO2
             // magic numbers yayyyyy
             if (Size == -5797)
             {
-                await ReplyAsync($"Event {Index.ToString("00")} will meet in Block-{events.ActiveEvents[Index].Block.ToString("000")}.");
+                await RespondAsync($"Event {Index.ToString("00")} will meet in Block-{events.ActiveEvents[Index].Block.ToString("000")}.");
                 return;
             }
 
@@ -377,25 +378,25 @@ namespace MPA_Bot.Modules.PSO2
 
             if (Size > 12)
             {
-                await ReplyAsync("You can't have more than 12 players in a MPA!");
+                await RespondAsync("You can't have more than 12 players in a MPA!");
                 return;
             }
 
             if (Size == 1)
             {
-                await ReplyAsync("Yeah let's make an empty MPA, that's it.");
+                await RespondAsync("Yeah let's make an empty MPA, that's it.");
                 return;
             }
 
             if (Size < 0)
             {
-                await ReplyAsync("Negative MPAs! That's how Sega has been hiding the 14*s!");
+                await RespondAsync("Negative MPAs! That's how Sega has been hiding the 14*s!");
                 return;
             }
 
             events.ActiveEvents[Index].MaxPlayers = Size;
 
-            await ReplyAsync($"The player cap for Event {Index.ToString("00")} has been changed to `{Size}`.");
+            await RespondAsync($"The player cap for Event {Index.ToString("00")} has been changed to `{Size}`.");
         }
 
         [Command("close")]
@@ -411,7 +412,7 @@ namespace MPA_Bot.Modules.PSO2
 
             events.ActiveEvents.Remove(Index);
 
-            await ReplyAsync($"Event {Index.ToString("00")} has been closed.");
+            await RespondAsync($"Event {Index.ToString("00")} has been closed.");
         }
 
         [Command("list")]
@@ -419,7 +420,7 @@ namespace MPA_Bot.Modules.PSO2
         {
             if (events.ActiveEvents.Count() == 0)
             {
-                await ReplyAsync($"There are no running events.");
+                await RespondAsync($"There are no running events.");
                 return;
             }
 
@@ -439,7 +440,7 @@ namespace MPA_Bot.Modules.PSO2
 
             output.Append("```");
 
-            await ReplyAsync(output.ToString());
+            await RespondAsync(output.ToString());
         }
 
         [Command("details")]
@@ -467,13 +468,13 @@ namespace MPA_Bot.Modules.PSO2
             if (!await CheckPermissions(Index, true))
                 return;
 
-            //await ReplyAsync($"Calling all registered members:\n<@" +
+            //await RespondAsync($"Calling all registered members:\n<@" +
             //    $"{string.Join(">, <@", events.ActiveEvents[Index].Players.Select(x => x.UserId))}>", embed: BuildEvent(events.ActiveEvents[Index], Index));
 
             if (events.ActiveEvents[Index].Players.Count(x => x.Leader) > 0)
                 await ReplyAsync("", embed: BuildParty(events.ActiveEvents[Index], Index));
             else
-                await ReplyAsync("You don't have any party leads set!");
+                await RespondAsync("You don't have any party leads set!");
         }
 
         [Command("leader")]
@@ -494,12 +495,12 @@ namespace MPA_Bot.Modules.PSO2
             {
                 if (events.ActiveEvents[Index].Players.Count(x => x.Leader) == 0)
                 {
-                    await ReplyAsync($"There are no leaders set for event {Index.ToString("00")}");
+                    await RespondAsync($"There are no leaders set for event {Index.ToString("00")}");
                     return;
                 }
                 else
                 {
-                    await ReplyAsync($"Removed <@{string.Join(">, <@", events.ActiveEvents[Index].Players.Where(x => x.Leader).Select(x => x.UserId))}>" +
+                    await RespondAsync($"Removed <@{string.Join(">, <@", events.ActiveEvents[Index].Players.Where(x => x.Leader).Select(x => x.UserId))}>" +
                         $"as leader{((events.ActiveEvents[Index].Players.Count(x => x.Leader) > 1) ? "s" : "")} for Event {Index.ToString("00")}");
 
                     events.ActiveEvents[Index].ClearLeaders();
@@ -529,7 +530,7 @@ namespace MPA_Bot.Modules.PSO2
 
             events.ActiveEvents[Index].SetLeaders(mentions);
 
-            await ReplyAsync($"Set {string.Join(", ", mentions.Select(x => x.Mention))} as leader{((events.ActiveEvents[Index].Players.Count(x => x.Leader) > 1) ? "s" : "")} of Event {Index.ToString("00")}");
+            await RespondAsync($"Set {string.Join(", ", mentions.Select(x => x.Mention))} as leader{((events.ActiveEvents[Index].Players.Count(x => x.Leader) > 1) ? "s" : "")} of Event {Index.ToString("00")}");
         }
 
         [Command("join")]
@@ -545,7 +546,7 @@ namespace MPA_Bot.Modules.PSO2
 
             if (events.ActiveEvents[Index].ContainsPlayer(Context.User))
             {
-                await ReplyAsync($"You're already in event {Index.ToString("00")}!\n" +
+                await RespondAsync($"You're already in event {Index.ToString("00")}!\n" +
                     $"You can leave with `>leave {Index.ToString("00")}` if you want.");
                 return;
             }
@@ -565,11 +566,11 @@ namespace MPA_Bot.Modules.PSO2
                 if (Class == "")
                     output.Append($"\nRemember to use `>class {Index} [class]` to set your class!");
 
-                await ReplyAsync(output.ToString());
+                await RespondAsync(output.ToString());
             }
             else
             {
-                await ReplyAsync($"Sorry {Context.User.Mention}, event {Index.ToString("00")} is full. ~~try to type faster next time~~");
+                await RespondAsync($"Sorry {Context.User.Mention}, event {Index.ToString("00")} is full. ~~try to type faster next time~~");
             }
         }
 
@@ -588,7 +589,7 @@ namespace MPA_Bot.Modules.PSO2
 
             if (mentions.Count() == 0)
             {
-                await ReplyAsync("You need to mention someone!");
+                await RespondAsync("You need to mention someone!");
                 return;
             }
 
@@ -605,16 +606,16 @@ namespace MPA_Bot.Modules.PSO2
             if (mentions.Count() == 1)
             {
                 if (removedNames.Count() == 0)
-                    await ReplyAsync($"That player isn't in event {Index.ToString("00")}!");
+                    await RespondAsync($"That player isn't in event {Index.ToString("00")}!");
                 else
-                    await ReplyAsync($"Removed {removedNames.FirstOrDefault()} from event {Index.ToString("00")}.");
+                    await RespondAsync($"Removed {removedNames.FirstOrDefault()} from event {Index.ToString("00")}.");
             }
             else if (mentions.Count() > 1)
             {
                 if (removedNames.Count() == 0)
-                    await ReplyAsync($"None of those players are in event {Index.ToString("00")}!");
+                    await RespondAsync($"None of those players are in event {Index.ToString("00")}!");
                 else
-                    await ReplyAsync($"Removed {string.Join(", ", removedNames.Take(removedNames.Count() - 1))}" +
+                    await RespondAsync($"Removed {string.Join(", ", removedNames.Take(removedNames.Count() - 1))}" +
                         $"{(removedNames.Count() > 2 ? "," : "")} " +
                         $"and {removedNames.LastOrDefault()} from event {Index.ToString("00")}.");
             }
@@ -635,7 +636,7 @@ namespace MPA_Bot.Modules.PSO2
 
             if (mentions.Count() == 0)
             {
-                await ReplyAsync("You need to mention someone!");
+                await RespondAsync("You need to mention someone!");
                 return;
             }
 
@@ -652,16 +653,16 @@ namespace MPA_Bot.Modules.PSO2
             if (mentions.Count() == 1)
             {
                 if (addedNames.Count() == 0)
-                    await ReplyAsync($"That player is already in event {Index.ToString("00")}!");
+                    await RespondAsync($"That player is already in event {Index.ToString("00")}!");
                 else
-                    await ReplyAsync($"Added {addedNames.FirstOrDefault()} to event {Index.ToString("00")}.");
+                    await RespondAsync($"Added {addedNames.FirstOrDefault()} to event {Index.ToString("00")}.");
             }
             else if (mentions.Count() > 1)
             {
                 if (addedNames.Count() == 0)
-                    await ReplyAsync($"All of those players are already in {Index.ToString("00")}!");
+                    await RespondAsync($"All of those players are already in {Index.ToString("00")}!");
                 else
-                    await ReplyAsync($"Added {string.Join(", ", addedNames.Take(addedNames.Count() - 1))}" +
+                    await RespondAsync($"Added {string.Join(", ", addedNames.Take(addedNames.Count() - 1))}" +
                         $"{(addedNames.Count() > 2 ? "," : "")} " +
                         $"and {addedNames.LastOrDefault()} to event {Index.ToString("00")}.");
             }
@@ -680,7 +681,7 @@ namespace MPA_Bot.Modules.PSO2
 
             if (!events.ActiveEvents[Index].ContainsPlayer(Context.User))
             {
-                await ReplyAsync($"*throws a rifle at {Context.User.Mention}*");
+                await RespondAsync($"*throws a rifle at {Context.User.Mention}*");
                 return;
             }
 
@@ -689,16 +690,16 @@ namespace MPA_Bot.Modules.PSO2
                 var player = events.ActiveEvents[Index].GetPlayer(Context.User);
 
                 if (player.Class == "")
-                    await ReplyAsync($"You haven't set a class, {Context.User.Mention}!");
+                    await RespondAsync($"You haven't set a class, {Context.User.Mention}!");
                 else
-                    await ReplyAsync($"{Context.User.Mention} your class in event {Index.ToString("00")} is\n{player.Class}");
+                    await RespondAsync($"{Context.User.Mention} your class in event {Index.ToString("00")} is\n{player.Class}");
 
                 return;
             }
 
             events.ActiveEvents[Index].SetClass(Context.User, Class);
 
-            await ReplyAsync($"{Context.User.Mention} your class in event {Index.ToString("00")} has been set to {Class}");
+            await RespondAsync($"{Context.User.Mention} your class in event {Index.ToString("00")} has been set to {Class}");
         }
 
         [Command("leave")]
@@ -714,10 +715,52 @@ namespace MPA_Bot.Modules.PSO2
 
             if (events.ActiveEvents[Index].RemovePlayer(Context.User))
             {
-                await ReplyAsync($"{Context.User.Mention} left event {Index.ToString("00")}.");
+                await RespondAsync($"{Context.User.Mention} left event {Index.ToString("00")}.");
             }
             else
-                await ReplyAsync($"*throws a rifle at {Context.User.Mention}*");
+                await RespondAsync($"*throws a rifle at {Context.User.Mention}*");
+        }
+
+        [Command("lock")]
+        public async Task LockEvent(int Index)
+        {
+            if (Index < 0)
+            {
+                Index *= -1;
+            }
+
+            if (!await CheckPermissions(Index))
+                return;
+
+            if (events.ActiveEvents[Index].Locked)
+            {
+                await RespondAsync($"Event {Index.ToString("00")} is already locked!");
+                return;
+            }
+
+            events.ActiveEvents[Index].Locked = true;
+            await RespondAsync($"Event {Index.ToString("00")} has been locked. Only managers may add new users now.");
+        }
+
+        [Command("unlock")]
+        public async Task UnlockEvent(int Index)
+        {
+            if (Index < 0)
+            {
+                Index *= -1;
+            }
+
+            if (!await CheckPermissions(Index))
+                return;
+
+            if (!events.ActiveEvents[Index].Locked)
+            {
+                await RespondAsync($"Event {Index.ToString("00")} isn't locked!");
+                return;
+            }
+
+            events.ActiveEvents[Index].Locked = false;
+            await RespondAsync($"Event {Index.ToString("00")} has been unlocked.");
         }
     }
 }

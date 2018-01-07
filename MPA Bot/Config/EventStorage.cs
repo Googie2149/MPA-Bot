@@ -86,6 +86,7 @@ namespace MPA_Bot.Modules.PSO2
         public int MaxPlayers = 12;
         public int Block = 201;
         public ulong Creator = 0;
+        public bool Locked = false;
 
         [JsonIgnore]
         public List<int> Party = new List<int>();

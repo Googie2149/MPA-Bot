@@ -54,7 +54,7 @@ namespace MPA_Bot.Modules.PSO2
             events = _events;
         }
 
-        private async Task<bool> CheckPermissions(int Index, bool ModRequired = false)
+        private async Task<bool> CheckPermissions(int Index, bool ModRequired = false, bool CheckLocked = false)
         {
             if (!events.ActiveEvents.ContainsKey(Index))
             {
@@ -62,16 +62,28 @@ namespace MPA_Bot.Modules.PSO2
                 return false;
             }
 
-            if (ModRequired && 
-                !(Context.User.Id == events.ActiveEvents[Index].Creator ||
-                ((IGuildUser)Context.User).RoleIds.Contains(ManagerRole))
-                )
+            if (ModRequired && CheckModPermissions(Index))
             {
-                await RespondAsync("You don't have permission to edit that event!");
-                return false;
+                return true;
             }
+            else
+            {
+                if (CheckLocked && events.ActiveEvents[Index].Locked)
+                {
+                    await RespondAsync($"Event {Index.ToString("00")} is locked, contact a manager or the event creator to join.");
+                    return false;
+                }
+                else
+                {
+                    await RespondAsync("You don't have permission to edit that event!");
+                    return false;
+                }
+            }
+        }
 
-            return true;
+        private bool CheckModPermissions(int Index)
+        {
+            return Context.User.Id == events.ActiveEvents[Index].Creator || ((IGuildUser)Context.User).RoleIds.Contains(ManagerRole);
         }
 
         private string Trim(string input)
@@ -541,7 +553,7 @@ namespace MPA_Bot.Modules.PSO2
                 Index *= -1;
             }
 
-            if (!await CheckPermissions(Index))
+            if (!await CheckPermissions(Index, CheckLocked: true))
                 return;
 
             if (events.ActiveEvents[Index].ContainsPlayer(Context.User))

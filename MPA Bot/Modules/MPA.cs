@@ -53,6 +53,26 @@ namespace MPA_Bot.Modules.PSO2
             events = _events;
         }
 
+        private async Task<bool> CheckPermissions(int Index, bool ModRequired = false, bool PartyLeadRequired = false)
+        {
+            if (!events.ActiveEvents.ContainsKey(Index))
+            {
+                await ReplyAsync($"There is no event in slot {Index.ToString("00")}!");
+                return false;
+            }
+
+            if (ModRequired && 
+                !(Context.User.Id == events.ActiveEvents[Index].Creator ||
+                ((IGuildUser)Context.User).RoleIds.Contains(ManagerRole))
+                )
+            {
+                await ReplyAsync("You don't have permission to edit that event!");
+                return false;
+            }
+
+            return true;
+        }
+
         private string Trim(string input)
         {
             int TrimLength = 100;
@@ -288,7 +308,6 @@ namespace MPA_Bot.Modules.PSO2
         }
 
         [Command("edit")]
-        
         public async Task EditEvent(int Index, [Remainder]string Description)
         {
             if (Index < 0)
@@ -296,17 +315,8 @@ namespace MPA_Bot.Modules.PSO2
                 Index *= -1;
             }
 
-            if (!events.ActiveEvents.ContainsKey(Index))
-            {
-                await ReplyAsync($"There is no event in slot {Index.ToString("00")}!");
+            if (!await CheckPermissions(Index, true))
                 return;
-            }
-
-            if (!(Context.User.Id == events.ActiveEvents[Index].Creator || ((IGuildUser)Context.User).RoleIds.Contains(ManagerRole)))
-            {
-                await ReplyAsync("You don't have permission to edit that event!");
-                return;
-            }
 
             if (Description == "")
             {
@@ -327,17 +337,8 @@ namespace MPA_Bot.Modules.PSO2
                 Index *= -1;
             }
 
-            if (!events.ActiveEvents.ContainsKey(Index))
-            {
-                await ReplyAsync($"There is no event in slot {Index.ToString("00")}!");
+            if (!await CheckPermissions(Index, true))
                 return;
-            }
-
-            if (!(Context.User.Id == events.ActiveEvents[Index].Creator || ((IGuildUser)Context.User).RoleIds.Contains(ManagerRole)))
-            {
-                await ReplyAsync("You don't have permission to edit that event!");
-                return;
-            }
 
             // magic numbers yayyyyy
             if (Block == -8437)
@@ -361,17 +362,8 @@ namespace MPA_Bot.Modules.PSO2
                 Index *= -1;
             }
 
-            if (!events.ActiveEvents.ContainsKey(Index))
-            {
-                await ReplyAsync($"There is no event in slot {Index.ToString("00")}!");
+            if (!await CheckPermissions(Index, true))
                 return;
-            }
-
-            if (!(Context.User.Id == events.ActiveEvents[Index].Creator || ((IGuildUser)Context.User).RoleIds.Contains(ManagerRole)))
-            {
-                await ReplyAsync("You don't have permission to edit that event!");
-                return;
-            }
 
             // magic numbers yayyyyy
             if (Size == -5797)
@@ -414,17 +406,8 @@ namespace MPA_Bot.Modules.PSO2
                 Index *= -1;
             }
 
-            if (!events.ActiveEvents.ContainsKey(Index))
-            {
-                await ReplyAsync($"There is no event in slot {Index.ToString("00")}!");
+            if (!await CheckPermissions(Index, true))
                 return;
-            }
-
-            if (!(Context.User.Id == events.ActiveEvents[Index].Creator || ((IGuildUser)Context.User).RoleIds.Contains(ManagerRole)))
-            {
-                await ReplyAsync("You don't have permission to edit that event!");
-                return;
-            }
 
             events.ActiveEvents.Remove(Index);
 
@@ -484,11 +467,8 @@ namespace MPA_Bot.Modules.PSO2
                 Index *= -1;
             }
 
-            if (!events.ActiveEvents.ContainsKey(Index))
-            {
-                await ReplyAsync($"There is no event in slot {Index.ToString("00")}!");
+            if (!await CheckPermissions(Index, true))
                 return;
-            }
 
             //await ReplyAsync($"Calling all registered members:\n<@" +
             //    $"{string.Join(">, <@", events.ActiveEvents[Index].Players.Select(x => x.UserId))}>", embed: BuildEvent(events.ActiveEvents[Index], Index));
@@ -508,17 +488,8 @@ namespace MPA_Bot.Modules.PSO2
                 Index *= -1;
             }
 
-            if (!events.ActiveEvents.ContainsKey(Index))
-            {
-                await ReplyAsync($"There is no event in slot {Index.ToString("00")}!");
+            if (!await CheckPermissions(Index, true))
                 return;
-            }
-
-            if (!(Context.User.Id == events.ActiveEvents[Index].Creator || ((IGuildUser)Context.User).RoleIds.Contains(ManagerRole)))
-            {
-                await ReplyAsync("You don't have permission to edit that event!");
-                return;
-            }
 
             var mentions = ((SocketUserMessage)Context.Message).MentionedUsers.ToList();
 
@@ -616,17 +587,8 @@ namespace MPA_Bot.Modules.PSO2
                 Index *= -1;
             }
 
-            if (!events.ActiveEvents.ContainsKey(Index))
-            {
-                await ReplyAsync($"There is no event in slot {Index.ToString("00")}!");
+            if (!await CheckPermissions(Index, true))
                 return;
-            }
-
-            if (!(Context.User.Id == events.ActiveEvents[Index].Creator || ((IGuildUser)Context.User).RoleIds.Contains(ManagerRole)))
-            {
-                await ReplyAsync("You don't have permission to edit that event!");
-                return;
-            }
 
             var mentions = ((SocketUserMessage)Context.Message).MentionedUsers.ToList();
 
@@ -661,6 +623,53 @@ namespace MPA_Bot.Modules.PSO2
                     await ReplyAsync($"Removed {string.Join(", ", removedNames.Take(removedNames.Count() - 1))}" +
                         $"{(removedNames.Count() > 2 ? "," : "")} " +
                         $"and {removedNames.LastOrDefault()} from event {Index.ToString("00")}.");
+            }
+        }
+
+        [Command("add")]
+        public async Task ForceAddPlayer(int Index, [Remainder]string Player = "")
+        {
+            if (Index < 0)
+            {
+                Index *= -1;
+            }
+
+            if (!await CheckPermissions(Index, true))
+                return;
+
+            var mentions = ((SocketUserMessage)Context.Message).MentionedUsers.ToList();
+
+            if (mentions.Count() == 0)
+            {
+                await ReplyAsync("You need to mention someone!");
+                return;
+            }
+
+            List<string> addedNames = new List<string>();
+
+            foreach (var m in mentions)
+            {
+                if (events.ActiveEvents[Index].AddPlayer(m))
+                {
+                    addedNames.Add(((SocketGuildUser)m).Nickname != null ? ((SocketGuildUser)m).Nickname : ((SocketGuildUser)m).Username);
+                }
+            }
+
+            if (mentions.Count() == 1)
+            {
+                if (addedNames.Count() == 0)
+                    await ReplyAsync($"That player is already in event {Index.ToString("00")}!");
+                else
+                    await ReplyAsync($"Added {addedNames.FirstOrDefault()} to event {Index.ToString("00")}.");
+            }
+            else if (mentions.Count() > 1)
+            {
+                if (addedNames.Count() == 0)
+                    await ReplyAsync($"All of those players are already in {Index.ToString("00")}!");
+                else
+                    await ReplyAsync($"Added {string.Join(", ", addedNames.Take(addedNames.Count() - 1))}" +
+                        $"{(addedNames.Count() > 2 ? "," : "")} " +
+                        $"and {addedNames.LastOrDefault()} to event {Index.ToString("00")}.");
             }
         }
 

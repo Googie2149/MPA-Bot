@@ -324,9 +324,7 @@ namespace MPA_Bot.Modules.PSO2
         public async Task EditEvent(int Index, [Remainder]string Description)
         {
             if (Index < 0)
-            {
                 Index *= -1;
-            }
 
             if (!await CheckPermissions(Index, true))
                 return;
@@ -346,9 +344,7 @@ namespace MPA_Bot.Modules.PSO2
         public async Task SetBlock(int Index, int Block = -8437)
         {
             if (Index < 0)
-            {
                 Index *= -1;
-            }
 
             if (!await CheckPermissions(Index, true))
                 return;
@@ -371,9 +367,7 @@ namespace MPA_Bot.Modules.PSO2
         public async Task SetSize(int Index, int Size = -5797)
         {
             if (Index < 0)
-            {
                 Index *= -1;
-            }
 
             if (!await CheckPermissions(Index, true))
                 return;
@@ -415,9 +409,7 @@ namespace MPA_Bot.Modules.PSO2
         public async Task CloseEvent(int Index)
         {
             if (Index < 0)
-            {
                 Index *= -1;
-            }
 
             if (!await CheckPermissions(Index, true))
                 return;
@@ -459,9 +451,7 @@ namespace MPA_Bot.Modules.PSO2
         public async Task EventDetails(int Index)
         {
             if (Index < 0)
-            {
                 Index *= -1;
-            }
 
             if (!await CheckPermissions(Index))
                 return;
@@ -473,9 +463,7 @@ namespace MPA_Bot.Modules.PSO2
         public async Task EventPing(int Index)
         {
             if (Index < 0)
-            {
                 Index *= -1;
-            }
 
             if (!await CheckPermissions(Index, true))
                 return;
@@ -494,9 +482,7 @@ namespace MPA_Bot.Modules.PSO2
         public async Task SetLeaders(int Index, [Remainder]string Mentions = "")
         {
             if (Index < 0)
-            {
                 Index *= -1;
-            }
 
             if (!await CheckPermissions(Index, true))
                 return;
@@ -549,9 +535,7 @@ namespace MPA_Bot.Modules.PSO2
         public async Task JoinEvent(int Index, [Remainder]string Class  = "")
         {
             if (Index < 0)
-            {
                 Index *= -1;
-            }
 
             if (!await CheckPermissions(Index, CheckLocked: true))
                 return;
@@ -590,9 +574,7 @@ namespace MPA_Bot.Modules.PSO2
         public async Task RemovePlayer(int Index, [Remainder]string Player = "")
         {
             if (Index < 0)
-            {
                 Index *= -1;
-            }
 
             if (!await CheckPermissions(Index, true))
                 return;
@@ -637,9 +619,7 @@ namespace MPA_Bot.Modules.PSO2
         public async Task ForceAddPlayer(int Index, [Remainder]string Player = "")
         {
             if (Index < 0)
-            {
                 Index *= -1;
-            }
 
             if (!await CheckPermissions(Index, true))
                 return;
@@ -684,9 +664,7 @@ namespace MPA_Bot.Modules.PSO2
         public async Task SetClass(int Index, [Remainder]string Class = "")
         {
             if (Index < 0)
-            {
                 Index *= -1;
-            }
 
             if (!await CheckPermissions(Index))
                 return;
@@ -718,9 +696,7 @@ namespace MPA_Bot.Modules.PSO2
         public async Task LeaveEvent(int Index)
         {
             if (Index < 0)
-            {
                 Index *= -1;
-            }
 
             if (!await CheckPermissions(Index))
                 return;
@@ -737,9 +713,7 @@ namespace MPA_Bot.Modules.PSO2
         public async Task LockEvent(int Index)
         {
             if (Index < 0)
-            {
                 Index *= -1;
-            }
 
             if (!await CheckPermissions(Index))
                 return;
@@ -758,9 +732,7 @@ namespace MPA_Bot.Modules.PSO2
         public async Task UnlockEvent(int Index)
         {
             if (Index < 0)
-            {
                 Index *= -1;
-            }
 
             if (!await CheckPermissions(Index))
                 return;

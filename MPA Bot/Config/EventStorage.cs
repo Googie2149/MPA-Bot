@@ -83,10 +83,12 @@ namespace MPA_Bot.Modules.PSO2
     {
         public string Description;
         public List<Player> Players = new List<Player>();
+        public List<Player> WaitList = new List<Player>();
         public int MaxPlayers = 12;
         public int Block = 201;
         public ulong Creator = 0;
         public bool Locked = false;
+        public List<int> LinkedEvents = new List<int>();
 
         [JsonIgnore]
         public List<int> Party = new List<int>();
@@ -98,8 +100,14 @@ namespace MPA_Bot.Modules.PSO2
 
         public bool AddPlayer(IUser user, string className = "", bool leader = false)
         {
-            if (Players.Count() >= MaxPlayers || ContainsPlayer(user))
+            if (ContainsPlayer(user))
                 return false;
+
+            if (Players.Count() >= MaxPlayers)
+            {
+                WaitList.Add(new Player() { UserId = user.Id, Class = className, Leader = leader });
+                return true;
+            }
 
             Players.Add(new Player() { UserId = user.Id, Class = className, Leader = leader });
             Party.Clear();
@@ -111,6 +119,19 @@ namespace MPA_Bot.Modules.PSO2
         {
             Players.Add(new Player() { PSOName = name, Class = className, Leader = leader });
             Party.Clear();
+        }
+
+        public List<Player> UpdateWaitlist()
+        {
+            if (WaitList.Count() == 0)
+                return null;
+
+            var tmp = WaitList.Take(MaxPlayers - Players.Count()).ToList();
+
+            Players.AddRange(tmp);
+            tmp.ForEach(x => WaitList.Remove(x));
+
+            return tmp;
         }
 
         public bool RemovePlayer(IUser user)

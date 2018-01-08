@@ -86,6 +86,22 @@ namespace MPA_Bot.Modules.PSO2
             return Context.User.Id == events.ActiveEvents[Index].Creator || ((IGuildUser)Context.User).RoleIds.Contains(ManagerRole);
         }
 
+        private string CheckWaitlist(int Index)
+        {
+            var tmp = events.ActiveEvents[Index].UpdateWaitlist();
+
+            if (tmp == null)
+                return "";
+
+            return $"{tmp.Take(tmp.Count() - 1).Select(x => x.PSOName == "" ? $"<@{x.UserId}>" : x.PSOName).Join(", ")}" +
+                $"{(tmp.Count() > 2 ? "," : "")} {(tmp.Count() > 1 ? "and " : "")}" +
+                $"{(tmp.LastOrDefault().PSOName == "" ? $"<@{tmp.LastOrDefault().UserId}>" : tmp.LastOrDefault().PSOName)} " +
+                $"{(tmp.Count() > 1 ? "have" : "has")} been added to event {Index.ToString("00")}.".TrimStart();
+            // This was fun to write but completely unmaintainable and unreadable.
+            // why did i do this
+            // help
+        }
+
         private string Trim(string input)
         {
             int TrimLength = 100;
@@ -611,7 +627,7 @@ namespace MPA_Bot.Modules.PSO2
                 else
                     await RespondAsync($"Removed {string.Join(", ", removedNames.Take(removedNames.Count() - 1))}" +
                         $"{(removedNames.Count() > 2 ? "," : "")} " +
-                        $"and {removedNames.LastOrDefault()} from event {Index.ToString("00")}.");
+                        $"and {removedNames.LastOrDefault()} from event {Index.ToString("00")}.\n{CheckWaitlist(Index)}");
             }
         }
 
@@ -703,7 +719,7 @@ namespace MPA_Bot.Modules.PSO2
 
             if (events.ActiveEvents[Index].RemovePlayer(Context.User))
             {
-                await RespondAsync($"{Context.User.Mention} left event {Index.ToString("00")}.");
+                await RespondAsync($"{Context.User.Mention} left event {Index.ToString("00")}.\n{CheckWaitlist(Index)}");
             }
             else
                 await RespondAsync($"*throws a rifle at {Context.User.Mention}*");
@@ -745,6 +761,20 @@ namespace MPA_Bot.Modules.PSO2
 
             events.ActiveEvents[Index].Locked = false;
             await RespondAsync($"Event {Index.ToString("00")} has been unlocked.");
+        }
+        
+        [Command("link")]
+        public async Task LinkEvents(int Index, int Index2)
+        {
+            if (Index < 0)
+                Index *= -1;
+            if (Index2 < 0)
+                Index2 *= -1;
+
+            if (!await CheckPermissions(Index, true))
+                return;
+
+
         }
     }
 }

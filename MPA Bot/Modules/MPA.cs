@@ -763,18 +763,5 @@ namespace MPA_Bot.Modules.PSO2
             await RespondAsync($"Event {Index.ToString("00")} has been unlocked.");
         }
         
-        [Command("link")]
-        public async Task LinkEvents(int Index, int Index2)
-        {
-            if (Index < 0)
-                Index *= -1;
-            if (Index2 < 0)
-                Index2 *= -1;
-
-            if (!await CheckPermissions(Index, true))
-                return;
-
-
-        }
     }
 }

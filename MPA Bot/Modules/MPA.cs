@@ -213,11 +213,7 @@ namespace MPA_Bot.Modules.PSO2
                 buildEvent.Party.Shuffle();
             }
 
-            var shuffled = new List<Player>();
-            foreach (var i in buildEvent.Party)
-            {
-                shuffled.Add(buildEvent.Players[i]);
-            }
+            var shuffled = new List<Player>(buildEvent.Players);
 
             var leaders = shuffled.Where(x => x.Leader).ToList();
 

@@ -306,6 +306,7 @@ namespace MPA_Bot.Modules.PSO2
         }
         
         [Command("create")]
+        [RequireContext(ContextType.Guild)]
         public async Task CreateEvent(int Index, [Remainder]string Description)
         {
             bool ownerJoining = true;
@@ -345,6 +346,7 @@ namespace MPA_Bot.Modules.PSO2
         }
 
         [Command("edit")]
+        [RequireContext(ContextType.Guild)]
         public async Task EditEvent(int Index, [Remainder]string Description)
         {
             if (Index < 0)
@@ -365,6 +367,7 @@ namespace MPA_Bot.Modules.PSO2
         }
 
         [Command("block")]
+        [RequireContext(ContextType.Guild)]
         public async Task SetBlock(int Index, int Block = -8437)
         {
             if (Index < 0)
@@ -388,6 +391,7 @@ namespace MPA_Bot.Modules.PSO2
         }
 
         [Command("size")]
+        [RequireContext(ContextType.Guild)]
         public async Task SetSize(int Index, int Size = -5797)
         {
             if (Index < 0)
@@ -430,6 +434,7 @@ namespace MPA_Bot.Modules.PSO2
         }
 
         [Command("close")]
+        [RequireContext(ContextType.Guild)]
         public async Task CloseEvent(int Index)
         {
             if (Index < 0)
@@ -444,6 +449,7 @@ namespace MPA_Bot.Modules.PSO2
         }
 
         [Command("list")]
+        [RequireContext(ContextType.Guild)]
         public async Task ListEvents()
         {
             if (events.ActiveEvents.Count() == 0)
@@ -472,6 +478,7 @@ namespace MPA_Bot.Modules.PSO2
         }
 
         [Command("details")]
+        [RequireContext(ContextType.Guild)]
         public async Task EventDetails(int Index)
         {
             if (Index < 0)
@@ -484,6 +491,7 @@ namespace MPA_Bot.Modules.PSO2
         }
 
         [Command("call")]
+        [RequireContext(ContextType.Guild)]
         public async Task EventPing(int Index)
         {
             if (Index < 0)
@@ -503,6 +511,7 @@ namespace MPA_Bot.Modules.PSO2
 
         [Command("leader")]
         [Alias("leaders")]
+        [RequireContext(ContextType.Guild)]
         public async Task SetLeaders(int Index, [Remainder]string Mentions = "")
         {
             if (Index < 0)
@@ -556,6 +565,7 @@ namespace MPA_Bot.Modules.PSO2
         }
 
         [Command("join")]
+        [RequireContext(ContextType.Guild)]
         public async Task JoinEvent(int Index, [Remainder]string Class  = "")
         {
             if (Index < 0)
@@ -595,6 +605,7 @@ namespace MPA_Bot.Modules.PSO2
         }
 
         [Command("remove")]
+        [RequireContext(ContextType.Guild)]
         public async Task RemovePlayer(int Index, [Remainder]string Player = "")
         {
             if (Index < 0)
@@ -640,6 +651,7 @@ namespace MPA_Bot.Modules.PSO2
         }
 
         [Command("add")]
+        [RequireContext(ContextType.Guild)]
         public async Task ForceAddPlayer(int Index, [Remainder]string Player = "")
         {
             if (Index < 0)
@@ -685,6 +697,7 @@ namespace MPA_Bot.Modules.PSO2
         }
 
         [Command("class")]
+        [RequireContext(ContextType.Guild)]
         public async Task SetClass(int Index, [Remainder]string Class = "")
         {
             if (Index < 0)
@@ -717,6 +730,7 @@ namespace MPA_Bot.Modules.PSO2
         }
 
         [Command("leave")]
+        [RequireContext(ContextType.Guild)]
         public async Task LeaveEvent(int Index)
         {
             if (Index < 0)
@@ -734,6 +748,7 @@ namespace MPA_Bot.Modules.PSO2
         }
 
         [Command("lock")]
+        [RequireContext(ContextType.Guild)]
         public async Task LockEvent(int Index)
         {
             if (Index < 0)
@@ -753,6 +768,7 @@ namespace MPA_Bot.Modules.PSO2
         }
 
         [Command("unlock")]
+        [RequireContext(ContextType.Guild)]
         public async Task UnlockEvent(int Index)
         {
             if (Index < 0)
@@ -772,6 +788,7 @@ namespace MPA_Bot.Modules.PSO2
         }
         
         [Command("start")]
+        [RequireContext(ContextType.Guild)]
         public async Task SendPasswords(int Index)
         {
             if (Index < 0)

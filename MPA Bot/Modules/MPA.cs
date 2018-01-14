@@ -40,7 +40,6 @@ namespace MPA_Bot.Modules.PSO2
         }
     }
     
-    [RequireContext(ContextType.Guild)]
     public class MPAs : MPAModule
     {
         private EventStorage events;
@@ -59,6 +58,15 @@ namespace MPA_Bot.Modules.PSO2
             if (!events.ActiveEvents.ContainsKey(Index))
             {
                 await RespondAsync($"There is no event in slot {Index.ToString("00")}!");
+                return false;
+            }
+
+            if (!ModRequired)
+                return true;
+
+            if (ModRequired && Context.Guild == null)
+            {
+                await RespondAsync("These commands cannot be run in DMs.");
                 return false;
             }
 
@@ -763,5 +771,71 @@ namespace MPA_Bot.Modules.PSO2
             await RespondAsync($"Event {Index.ToString("00")} has been unlocked.");
         }
         
+        [Command("start")]
+        public async Task SendPasswords(int Index)
+        {
+            if (Index < 0)
+                Index *= -1;
+
+            if (!await CheckPermissions(Index))
+                return;
+
+            if (events.ActiveEvents[Index].Password != 0)
+            {
+                await RespondAsync($"You've already started this event!");
+                return;
+            }
+
+            events.ActiveEvents[Index].Password = RandomUtil.Int(10, 100);
+
+            await RespondAsync("Sending passwords in DMs...");
+
+            foreach (var p in events.ActiveEvents[Index].Players)
+            {
+                await SendPassword(Index, Context.Guild.GetUser(p.UserId));
+                await Task.Delay(1050);
+            }
+        }
+
+        [Command("password")]
+        private async Task RecallPassword(int Index)
+        {
+            if (Index < 0)
+                Index *= -1;
+
+            if (!await CheckPermissions(Index))
+                return;
+
+            if (!events.ActiveEvents[Index].ContainsPlayer(Context.User))
+            {
+                await RespondAsync($"You're not part of event {Index.ToString("00")}!");
+                return;
+            }
+
+            if (events.ActiveEvents[Index].Password == 0)
+            {
+                await RespondAsync($"Event {Index.ToString("00")} hasn't started yet, or it doesn't need a randomized password.");
+                return;
+            }
+
+            if (Context.Guild != null)
+                await RespondAsync($"Check your DMs for the password!");
+
+            await SendPassword(Index, Context.User);
+        }
+
+        private async Task SendPassword(int Index, IUser player)
+        {
+            var msg = await player.SendMessageAsync($"The password for event {Index.ToString("00")} is `{events.ActiveEvents[Index].Password}`");
+
+            Task.Run(async () =>
+            {
+                await Task.Delay(1000 * 60 * 30 + (RandomUtil.Int(100) * 100)); // wait about 30 minutes
+
+                await msg.DeleteAsync();
+            });
+
+            // Todo: intelligently remember these so they can be cleared when the password is requested again, or the event is deleted
+        }
     }
 }

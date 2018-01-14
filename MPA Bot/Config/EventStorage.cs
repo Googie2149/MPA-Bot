@@ -88,6 +88,7 @@ namespace MPA_Bot.Modules.PSO2
         public int Block = 201;
         public ulong Creator = 0;
         public bool Locked = false;
+        public int Password = 0;
 
         [JsonIgnore]
         public List<int> Party = new List<int>();

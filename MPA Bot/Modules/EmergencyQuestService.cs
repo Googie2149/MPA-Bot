@@ -69,7 +69,7 @@ namespace MPA_Bot.Modules.PSO2
                         }
 
                         //Console.WriteLine("Starting automated download");
-                        var request = (HttpWebRequest)WebRequest.Create("http://pso2.kaze.rip/eq/");
+                        var request = (HttpWebRequest)WebRequest.Create("http://pso2.rodrigo.li/eq/");
                         request.Method = "GET";
                         request.AllowReadStreamBuffering = false;
 

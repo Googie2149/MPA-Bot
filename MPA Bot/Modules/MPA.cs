@@ -424,9 +424,14 @@ namespace MPA_Bot.Modules.PSO2
                 return;
             }
 
-            events.ActiveEvents[Index].MaxPlayers = Size;
+            string extra = "";
 
-            await RespondAsync($"The player cap for Event {Index.ToString("00")} has been changed to `{Size}`.");
+            if (Size > events.ActiveEvents[Index].MaxPlayers)
+                extra = "\n" + CheckWaitlist(Index);
+
+            events.ActiveEvents[Index].MaxPlayers = Size;
+            
+            await RespondAsync($"The player cap for Event {Index.ToString("00")} has been changed to `{Size}`.{extra}");
         }
 
         [Command("close")]

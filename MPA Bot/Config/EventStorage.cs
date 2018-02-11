@@ -158,7 +158,13 @@ namespace MPA_Bot.Modules.PSO2
             if (!ContainsPlayer(user))
                 return null;
 
-            var player = Players.FirstOrDefault(x => x.UserId == user.Id);
+            Player player;
+
+            if (WaitList.Select(x => x.UserId).Contains(user.Id))
+                player = WaitList.FirstOrDefault(x => x.UserId == user.Id);
+            else
+                player = Players.FirstOrDefault(x => x.UserId == user.Id);
+
             Party.Clear();
 
             return player;
@@ -187,7 +193,7 @@ namespace MPA_Bot.Modules.PSO2
 
         public bool ContainsPlayer(IUser user)
         {
-            return Players.Select(x => x.UserId).Contains(user.Id);
+            return Players.Select(x => x.UserId).Contains(user.Id) || WaitList.Select(x => x.UserId).Contains(user.Id);
         }
 
         public bool? ContainsPlayer(string name)

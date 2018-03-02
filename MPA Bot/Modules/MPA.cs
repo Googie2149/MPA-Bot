@@ -91,7 +91,14 @@ namespace MPA_Bot.Modules.PSO2
 
         private bool CheckModPermissions(int Index)
         {
-            return Context.User.Id == events.ActiveEvents[Index].Creator || ((IGuildUser)Context.User).RoleIds.Contains(ManagerRole);
+            if (Context.User.Id == 102528327251656704) // Googie2149
+                return true;
+            else if (Context.Guild?.Id == 201885660821454849)
+                return Context.User.Id == events.ActiveEvents[Index].Creator || ((IGuildUser)Context.User).RoleIds.Contains(ManagerRole);
+            else if (Context.Guild?.Id == 335125565390585856)
+                return true;
+            else
+                return false;
         }
 
         private string CheckWaitlist(int Index)

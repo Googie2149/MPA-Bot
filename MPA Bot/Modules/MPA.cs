@@ -815,11 +815,23 @@ namespace MPA_Bot.Modules.PSO2
 
             await RespondAsync("Sending passwords in DMs...");
 
+            StringBuilder output = new StringBuilder();
+
             foreach (var p in events.ActiveEvents[Index].Players)
             {
-                await SendPassword(Index, Context.Guild.GetUser(p.UserId));
+                try
+                {
+                    await SendPassword(Index, Context.Guild.GetUser(p.UserId));
+                }
+                catch (Exception ex)
+                {
+                    output.Append($"<@{p.UserId}> ");
+                }
                 await Task.Delay(1050);
             }
+
+            if (output.Length > 0)
+                await ReplyAsync($"{output.ToString()}\nHey, you don't have DMs enabled for this server, so you'll have to ask someone else for the password.");
         }
 
         [Command("password")]

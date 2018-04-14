@@ -831,7 +831,7 @@ namespace MPA_Bot.Modules.PSO2
             }
 
             if (output.Length > 0)
-                await ReplyAsync($"{output.ToString()}\nHey, you don't have DMs enabled for this server, so you'll have to ask someone else for the password.");
+                await ReplyAsync($"{output.ToString()}\nHey, you don't have DMs enabled for this server, so you'll have to ask someone else for the password or turn your DMs on for this server.");
         }
 
         [Command("password")]

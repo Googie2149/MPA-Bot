@@ -38,7 +38,6 @@ namespace MPA_Bot
 
         [Command("quit")]
         [Priority(1000)]
-        [RequireOwner()]
         public async Task ShutDown()
         {
             if (Context.User.Id != 102528327251656704)

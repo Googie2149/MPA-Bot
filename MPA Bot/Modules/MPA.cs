@@ -448,7 +448,7 @@ namespace MPA_Bot.Modules.PSO2
             if (Index < 0)
                 Index *= -1;
 
-            if (!await CheckPermissions(Index, true))
+            if (!await CheckPermissions(Index, false))
                 return;
 
             events.ActiveEvents.Remove(Index);

@@ -105,7 +105,7 @@ namespace MPA_Bot
                 await ReplyAsync("rip");
                 //await Task.Delay(500);
                 await Context.Client.LogoutAsync();
-                Environment.Exit((int)ExitCodes.ExitCode.RestartAndUpdate);
+                Environment.Exit((int)ExitCodes.ExitCode.Success);
             });
         }
 
@@ -114,8 +114,18 @@ namespace MPA_Bot
         [Hide]
         public async Task UpdateAndRestart()
         {
+            if (Context.User.Id != 102528327251656704)
+            {
+                await RespondAsync(":no_good::skin-tone-3: You don't have permission to run this command!");
+                return;
+            }
+
             Environment.SetEnvironmentVariable("UPDATE", Context.Channel.ToIDString());
-            await ReplyAsync("if im not back in 15 minutes, you're legally allowed to delete the server");
+            events.Save();
+            config.Save();
+
+            await ReplyAsync("rip");
+            //await Task.Delay(500);
             await Context.Client.LogoutAsync();
             Environment.Exit((int)ExitCodes.ExitCode.RestartAndUpdate);
         }

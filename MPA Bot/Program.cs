@@ -47,7 +47,7 @@ namespace MPA_Bot
 
             SuccessfulConnectionTimer();
             client.Disconnected += SocketClient_Disconnected;
-
+            client.GuildAvailable += Client_GuildAvailable;
 
             handler = new CommandHandler();
             await handler.Install(map);
@@ -58,6 +58,18 @@ namespace MPA_Bot
             //await client.CurrentUser.ModifyAsync(x => x.Avatar = avatar);
 
             await Task.Delay(-1);
+        }
+
+        private async Task Client_GuildAvailable(SocketGuild guild)
+        {
+            if (Environment.GetEnvironmentVariable("UPDATE") != "0" &&
+                guild.TextChannels.Select(x => x.ToIDString()).Contains(Environment.GetEnvironmentVariable("UPDATE")))
+            {
+                // Not checking this will probably come back to bite me one day
+                ulong channel = ulong.Parse(Environment.GetEnvironmentVariable("UPDATE"));
+
+                await guild.GetTextChannel(channel).SendMessageAsync("yay I'm back server lives");
+            }
         }
 
         private async Task SocketClient_Disconnected(Exception ex)

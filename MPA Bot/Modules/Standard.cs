@@ -117,7 +117,7 @@ namespace MPA_Bot
             await ReplyAsync("if im not back in 15 minutes, you're legally allowed to delete the server");
             await Context.Client.LogoutAsync();
             Environment.SetEnvironmentVariable("UPDATE", Context.Channel.ToIDString());
-            
+            Environment.Exit((int)ExitCodes.ExitCode.RestartAndUpdate);
         }
     }
 }

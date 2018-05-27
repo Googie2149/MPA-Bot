@@ -105,7 +105,7 @@ namespace MPA_Bot
                 await ReplyAsync("rip");
                 //await Task.Delay(500);
                 await Context.Client.LogoutAsync();
-                Environment.Exit(0);
+                Environment.Exit((int)ExitCodes.ExitCode.Success);
             });
         }
 
@@ -114,9 +114,10 @@ namespace MPA_Bot
         [Hide]
         public async Task UpdateAndRestart()
         {
-            await ReplyAsync("if im not back in 15 minutes, you're legally allowed to delete the server");
-            await Context.Client.LogoutAsync();
             Environment.SetEnvironmentVariable("UPDATE", Context.Channel.ToIDString());
+            await ReplyAsync("if im not back in 15 minutes, you're legally allowed to delete the server");
+            Context.Client.LogoutAsync();
+            await Task.Delay(500);
             Environment.Exit((int)ExitCodes.ExitCode.RestartAndUpdate);
         }
     }

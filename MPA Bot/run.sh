@@ -4,15 +4,15 @@ RESTARTS=0
 UPDATE=0
 while true; do
 	dotnet run
-	if [ $? -eq 0 ] #Intentional close, exit script
+	if [ $? -eq 0 ] then # Intentional close, exit script
 		echo "Exited cleanly."
 		exit 0
-	elif [ $? -eq 5 ] #Pull latest code and rebuild
+	elif [ $? -eq 5 ] then # Pull latest code and rebuild
 		cd ..
 		git pull
 		cd -
 		RESTARTS=0
-	elif [ $? -eq 12 ] #Escaping a deadlock
+	elif [ $? -eq 12 ] then # Escaping a deadlock
 		RESTARTS=$((RESTARTS + 1))
 		UPDATE=0
 		if [ $RESTARTS -ge 6]

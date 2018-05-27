@@ -108,5 +108,16 @@ namespace MPA_Bot
                 Environment.Exit(0);
             });
         }
+
+        [Command("update")]
+        [Priority(1000)]
+        [Hide]
+        public async Task UpdateAndRestart()
+        {
+            await ReplyAsync("if im not back in 15 minutes, you're legally allowed to delete the server");
+            await Context.Client.LogoutAsync();
+            Environment.SetEnvironmentVariable("UPDATE", Context.Channel.ToIDString());
+            
+        }
     }
 }

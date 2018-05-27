@@ -43,7 +43,11 @@ namespace MPA_Bot
             eqService = new EmergencyQuestService();
             await eqService.Install(map);
 
-           map = new ServiceCollection().AddSingleton(client).AddSingleton(config).AddSingleton(events).AddSingleton(eqService).BuildServiceProvider();
+            map = new ServiceCollection().AddSingleton(client).AddSingleton(config).AddSingleton(events).AddSingleton(eqService).BuildServiceProvider();
+
+            SuccessfulConnectionTimer();
+            client.Disconnected += SocketClient_Disconnected;
+
 
             handler = new CommandHandler();
             await handler.Install(map);
@@ -54,6 +58,34 @@ namespace MPA_Bot
             //await client.CurrentUser.ModifyAsync(x => x.Avatar = avatar);
 
             await Task.Delay(-1);
+        }
+
+        private async Task SocketClient_Disconnected(Exception ex)
+        {
+            // If we disconnect, wait 3 minutes and see if we regained the connection.
+            // If we did, great, exit out and continue. If not, check again 3 minutes later
+            // just to be safe, and restart to exit a deadlock.
+            var task = Task.Run(async () =>
+            {
+                for (int i = 0; i < 2; i++)
+                {
+                    await Task.Delay(1000 * 60 * 3);
+
+                    if (client.ConnectionState == ConnectionState.Connected)
+                        break;
+                    else if (i == 1)
+                    {
+                        Environment.Exit((int)ExitCodes.ExitCode.DeadlockEscape);
+                    }
+                }
+            });
+        }
+
+        private async Task SuccessfulConnectionTimer()
+        {
+            // Wait 20 minutes, and if we're still running reset the restart counter
+            await Task.Delay(1000 * 60 * 20);
+            Environment.SetEnvironmentVariable("RESTARTS", "0");
         }
 
         private Task Log(LogMessage msg)

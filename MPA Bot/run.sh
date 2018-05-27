@@ -1,31 +1,31 @@
-﻿#!/bin/bash
+#!/bin/bash
 
 RESTARTS=0
 UPDATE=0
 while true; do
 	dotnet run
-	if [ $? -eq 0 ] then # Intentional close, exit script
+	if [ $? -eq 0 ]; then 
 		echo "Exited cleanly."
 		exit 0
-	elif [ $? -eq 5 ] then # Pull latest code and rebuild
+	elif [ $? -eq 5 ]; then
 		cd ..
 		git pull
 		cd -
 		RESTARTS=0
-	elif [ $? -eq 12 ] then # Escaping a deadlock
+	elif [ $? -eq 12 ]; then 
 		RESTARTS=$((RESTARTS + 1))
 		UPDATE=0
-		if [ $RESTARTS -ge 6]
+		if [ $RESTARTS -ge 6]; then
 			echo "Too many failed restart attempts, Discord is likely having massive issues."
 			exit 12 
-		fi
+		fi;
 	else
 		RESTARTS=$((RESTARTS + 1))
 		UPDATE=0
 		sleep 30s
-		if [ $RESTARTS -ge 12]
+		if [ $RESTARTS -ge 12]; then
 			echo "$?: Too many failed restart attempts"
 			exit 1
-		fi
-	fi
+		fi;
+	fi;
 done

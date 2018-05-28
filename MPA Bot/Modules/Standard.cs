@@ -160,11 +160,11 @@ namespace MPA_Bot
                 return;
             }
 
+            File.Create("./deadlock");
             events.Save();
             config.Save();
 
             await ReplyAsync("Restarting...");
-
             await Context.Client.LogoutAsync();
             await Task.Delay(1000);
             Environment.Exit((int)ExitCodes.ExitCode.DeadlockEscape);

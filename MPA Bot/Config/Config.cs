@@ -28,6 +28,9 @@ namespace MPA_Bot
         [JsonProperty("success_response")]
         public string SuccessResponse { get; set; } = ":thumbsup:";
 
+        [JsonProperty("owner_id")]
+        public ulong OwnerId { get; set; } = 0;
+
         public static Config Load()
         {
             if (File.Exists("config.json"))

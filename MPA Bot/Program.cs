@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
+using Discord.Rest;
 using Discord.Commands;
 using System.IO;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,15 +18,30 @@ namespace MPA_Bot
         static void Main(string[] args) =>
             new Program().RunAsync().GetAwaiter().GetResult();
 
-        private DiscordSocketClient client;
+        private DiscordSocketClient socketClient;
+        private DiscordRestClient restClient;
         private Config config;
         private EventStorage events;
         private CommandHandler handler;
         private EmergencyQuestService eqService;
         private ulong updateChannel = 0;
+        private ulong restartMessage = 0;
 
         private async Task RunAsync()
         {
+            socketClient = new DiscordSocketClient(new DiscordSocketConfig
+            {
+                //WebSocketProvider = WS4NetProvider.Instance,
+                LogLevel = LogSeverity.Verbose
+            });
+            socketClient.Log += Log;
+
+            restClient = new DiscordRestClient(new DiscordRestConfig
+            {
+                LogLevel = LogSeverity.Verbose
+            });
+            restClient.Log += Log;
+
             if (File.Exists("./update"))
             {
                 var temp = File.ReadAllText("./update");
@@ -33,29 +49,30 @@ namespace MPA_Bot
                 File.Delete("./update");
                 Console.WriteLine($"Found an update file! It contained [{temp}] and we got [{updateChannel}] from it!");
             }
-
-            client = new DiscordSocketClient(new DiscordSocketConfig
+            
+            if (File.Exists("./deadlock"))
             {
-                //WebSocketProvider = WS4NetProvider.Instance,
-                LogLevel = LogSeverity.Verbose
-            });
-            client.Log += Log;
+                Console.WriteLine("We're recovering from a deadlock.");
+                socketClient.Connected += DeadlockRecoveryMessage;
+            }
 
             config = Config.Load();
             events = EventStorage.Load();
 
-            var map = new ServiceCollection().AddSingleton(client).AddSingleton(config).AddSingleton(events).BuildServiceProvider();
+            var map = new ServiceCollection().AddSingleton(socketClient).AddSingleton(config).AddSingleton(events).BuildServiceProvider();
 
-            await client.LoginAsync(TokenType.Bot, config.Token);
-            await client.StartAsync();
+            await socketClient.LoginAsync(TokenType.Bot, config.Token);
+            await socketClient.StartAsync();
+
+            await restClient.LoginAsync(TokenType.Bot, config.Token);
 
             eqService = new EmergencyQuestService();
             await eqService.Install(map);
 
-            map = new ServiceCollection().AddSingleton(client).AddSingleton(config).AddSingleton(events).AddSingleton(eqService).BuildServiceProvider();
+            map = new ServiceCollection().AddSingleton(socketClient).AddSingleton(config).AddSingleton(events).AddSingleton(eqService).BuildServiceProvider();
             
-            client.Disconnected += SocketClient_Disconnected;
-            client.GuildAvailable += Client_GuildAvailable;
+            socketClient.Disconnected += SocketClient_Disconnected;
+            socketClient.GuildAvailable += Client_GuildAvailable;
 
             handler = new CommandHandler();
             await handler.Install(map);
@@ -68,12 +85,18 @@ namespace MPA_Bot
             await Task.Delay(-1);
         }
 
+        private async Task DeadlockRecoveryMessage()
+        {
+            await socketClient.GetUser(config.OwnerId)?.SendMessageAsync("I recovered from a deadlock.");
+            socketClient.Connected -= DeadlockRecoveryMessage;
+        }
+
         private async Task Client_GuildAvailable(SocketGuild guild)
         {
             if (updateChannel != 0 && guild.GetTextChannel(updateChannel) != null)
             {
                 await Task.Delay(3000); // wait 3 seconds just to ensure we can actually send it. this might not do anything.
-                await guild.GetTextChannel(updateChannel).SendMessageAsync("yay I'm back server lives");
+                await guild.GetTextChannel(updateChannel).SendMessageAsync("aaaaaand we're back.");
             }
         }
 
@@ -88,10 +111,11 @@ namespace MPA_Bot
                 {
                     await Task.Delay(1000 * 60 * 3);
 
-                    if (client.ConnectionState == ConnectionState.Connected)
+                    if (socketClient.ConnectionState == ConnectionState.Connected)
                         break;
                     else if (i == 1)
                     {
+                        File.Create("./deadlock");
                         Environment.Exit((int)ExitCodes.ExitCode.DeadlockEscape);
                     }
                 }

@@ -106,6 +106,28 @@ namespace MPA_Bot
             Environment.Exit((int)ExitCodes.ExitCode.Success);
         }
 
+        [Command("restart", RunMode = RunMode.Async)]
+        [Priority(1000)]
+        [Hide]
+        public async Task Restart()
+        {
+            if (Context.User.Id != 102528327251656704)
+            {
+                await RespondAsync(":no_good::skin-tone-3: You don't have permission to run this command!");
+                return;
+            }
+
+            events.Save();
+            config.Save();
+
+            await ReplyAsync("Restarting...");
+            await File.WriteAllTextAsync("./update", Context.Channel.Id.ToString());
+
+            await Context.Client.LogoutAsync();
+            await Task.Delay(1000);
+            Environment.Exit((int)ExitCodes.ExitCode.Restart);
+        }
+
         [Command("update", RunMode = RunMode.Async)]
         [Priority(1000)]
         [Hide]
@@ -116,15 +138,36 @@ namespace MPA_Bot
                 await RespondAsync(":no_good::skin-tone-3: You don't have permission to run this command!");
                 return;
             }
-
-            Console.WriteLine($"Saving {Context.Channel.Id.ToString()} to file");
+            
+            await File.WriteAllTextAsync("./update", Context.Channel.Id.ToString());
             events.Save();
             config.Save();
             
-            await ReplyAsync("if im not back in 15 minutes, you're legally allowed to delete the server");
+            await ReplyAsync("hold on i gotta go break everything");
             await Context.Client.LogoutAsync();
             await Task.Delay(1000);
             Environment.Exit((int)ExitCodes.ExitCode.RestartAndUpdate);
+        }
+
+        [Command("deadlocksim", RunMode = RunMode.Async)]
+        [Priority(1000)]
+        [Hide]
+        public async Task DeadlockSimulation()
+        {
+            if (Context.User.Id != 102528327251656704)
+            {
+                await RespondAsync(":no_good::skin-tone-3: You don't have permission to run this command!");
+                return;
+            }
+
+            events.Save();
+            config.Save();
+
+            await ReplyAsync("Restarting...");
+
+            await Context.Client.LogoutAsync();
+            await Task.Delay(1000);
+            Environment.Exit((int)ExitCodes.ExitCode.DeadlockEscape);
         }
     }
 }

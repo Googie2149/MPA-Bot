@@ -16,7 +16,7 @@ while true; do
 		dotnet restore
 		cd -
 		RESTARTS=0
-		echo "Restartin..."
+		echo "Restarting..."
 	elif [ $EXIT -eq 12 ]; then 
 		RESTARTS=$((RESTARTS + 1))
 		if [ $RESTARTS -ge 6]; then

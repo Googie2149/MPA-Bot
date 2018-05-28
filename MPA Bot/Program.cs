@@ -31,7 +31,7 @@ namespace MPA_Bot
                 var temp = File.ReadAllText("./update");
                 ulong.TryParse(temp, out updateChannel);
                 File.Delete("./update");
-                Console.WriteLine($"Found a file! It contained [{temp}] and we got [{updateChannel}] from it!");
+                Console.WriteLine($"Found an update file! It contained [{temp}] and we got [{updateChannel}] from it!");
             }
 
             client = new DiscordSocketClient(new DiscordSocketConfig
@@ -70,15 +70,10 @@ namespace MPA_Bot
 
         private async Task Client_GuildAvailable(SocketGuild guild)
         {
-            Console.WriteLine($"Guild availble {guild.Name}, looking for {updateChannel}");
-            foreach (var channel in guild.TextChannels)
-            {
-                Console.WriteLine($"{channel.Id} | {channel.Name}");
-            }
             if (updateChannel != 0 && guild.GetTextChannel(updateChannel) != null)
             {
+                await Task.Delay(3000); // wait 3 seconds just to ensure we can actually send it. this might not do anything.
                 await guild.GetTextChannel(updateChannel).SendMessageAsync("yay I'm back server lives");
-                Console.WriteLine("this should have sent a message");
             }
         }
 

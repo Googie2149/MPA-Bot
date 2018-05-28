@@ -118,7 +118,6 @@ namespace MPA_Bot
             }
 
             Console.WriteLine($"Saving {Context.Channel.Id.ToString()} to file");
-            await File.WriteAllTextAsync("./update", Context.Channel.Id.ToString());
             events.Save();
             config.Save();
             

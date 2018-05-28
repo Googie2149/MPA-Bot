@@ -7,6 +7,7 @@
     {
         Success = 0,
         GeneralError = 1,
+        Restart = 4,
         RestartAndUpdate = 5,
         DeadlockEscape = 12
     }

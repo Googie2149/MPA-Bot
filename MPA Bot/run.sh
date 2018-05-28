@@ -11,6 +11,7 @@ while true; do
 		echo "Pulling latest update..."
 		cd ..
 		git pull
+		dotnet restore
 		cd -
 		RESTARTS=0
 		echo "Restartin..."

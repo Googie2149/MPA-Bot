@@ -116,7 +116,7 @@ namespace MPA_Bot
                 return;
             }
             
-            await File.WriteAllTextAsync("./update", Context.Channel.ToIDString());
+            await File.WriteAllTextAsync("./update", Context.Channel.Id.ToString());
             events.Save();
             config.Save();
             

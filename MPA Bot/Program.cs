@@ -49,13 +49,6 @@ namespace MPA_Bot
                 File.Delete("./update");
                 Console.WriteLine($"Found an update file! It contained [{temp}] and we got [{updateChannel}] from it!");
             }
-            
-            if (File.Exists("./deadlock"))
-            {
-                Console.WriteLine("We're recovering from a deadlock.");
-                File.Delete("./deadlock");
-                socketClient.Connected += DeadlockRecoveryMessage;
-            }
 
             config = Config.Load();
             events = EventStorage.Load();
@@ -66,6 +59,13 @@ namespace MPA_Bot
             await socketClient.StartAsync();
 
             await restClient.LoginAsync(TokenType.Bot, config.Token);
+            
+            if (File.Exists("./deadlock"))
+            {
+                Console.WriteLine("We're recovering from a deadlock.");
+                File.Delete("./deadlock");
+                (await restClient.GetUserAsync(config.OwnerId))?.SendMessageAsync("I recovered from a deadlock.");
+            }
 
             eqService = new EmergencyQuestService();
             await eqService.Install(map);
@@ -84,13 +84,6 @@ namespace MPA_Bot
             //await client.CurrentUser.ModifyAsync(x => x.Avatar = avatar);
 
             await Task.Delay(-1);
-        }
-
-        private async Task DeadlockRecoveryMessage()
-        {
-            //await socketClient.GetUser(config.OwnerId)?.SendMessageAsync("I recovered from a deadlock.");
-            (await restClient.GetUserAsync(config.OwnerId))?.SendMessageAsync("I recovered from a deadlock.");
-            socketClient.Connected -= DeadlockRecoveryMessage;
         }
 
         private async Task Client_GuildAvailable(SocketGuild guild)

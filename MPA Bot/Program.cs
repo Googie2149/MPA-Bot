@@ -64,7 +64,7 @@ namespace MPA_Bot
             {
                 Console.WriteLine("We're recovering from a deadlock.");
                 File.Delete("./deadlock");
-                (await restClient.GetUserAsync(config.OwnerId))?.SendMessageAsync("I recovered from a deadlock.");
+                (await restClient.GetUserAsync(config.OwnerId))?.SendMessageAsync($"I recovered from a deadlock.\n`{DateTime.Now.ToShortDateString()}` `{DateTime.Now.ToLongTimeString()}`");
             }
 
             eqService = new EmergencyQuestService();

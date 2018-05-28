@@ -1,20 +1,21 @@
 #!/bin/bash
 
 RESTARTS=0
-UPDATE=0
+rm ./update
 while true; do
 	dotnet run
 	if [ $? -eq 0 ]; then 
 		echo "Exited cleanly."
 		exit 0
 	elif [ $? -eq 5 ]; then
+		echo "Pulling latest update..."
 		cd ..
 		git pull
 		cd -
 		RESTARTS=0
+		echo "Restartin..."
 	elif [ $? -eq 12 ]; then 
 		RESTARTS=$((RESTARTS + 1))
-		UPDATE=0
 		if [ $RESTARTS -ge 6]; then
 			echo "Too many failed restart attempts, Discord is likely having massive issues."
 			exit 12 

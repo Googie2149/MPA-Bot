@@ -91,7 +91,7 @@ namespace MPA_Bot
         [Hide]
         public async Task ShutDown()
         {
-            if (Context.User.Id != 102528327251656704)
+            if (Context.User.Id != config.OwnerId)
             {
                 await RespondAsync(":no_good::skin-tone-3: You don't have permission to run this command!");
                 return;
@@ -111,7 +111,7 @@ namespace MPA_Bot
         [Hide]
         public async Task Restart()
         {
-            if (Context.User.Id != 102528327251656704)
+            if (Context.User.Id != config.OwnerId)
             {
                 await RespondAsync(":no_good::skin-tone-3: You don't have permission to run this command!");
                 return;
@@ -133,7 +133,7 @@ namespace MPA_Bot
         [Hide]
         public async Task UpdateAndRestart()
         {
-            if (Context.User.Id != 102528327251656704)
+            if (Context.User.Id != config.OwnerId)
             {
                 await RespondAsync(":no_good::skin-tone-3: You don't have permission to run this command!");
                 return;
@@ -154,7 +154,7 @@ namespace MPA_Bot
         [Hide]
         public async Task DeadlockSimulation()
         {
-            if (Context.User.Id != 102528327251656704)
+            if (Context.User.Id != config.OwnerId)
             {
                 await RespondAsync(":no_good::skin-tone-3: You don't have permission to run this command!");
                 return;

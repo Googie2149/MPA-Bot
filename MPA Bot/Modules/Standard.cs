@@ -116,7 +116,8 @@ namespace MPA_Bot
                 await RespondAsync(":no_good::skin-tone-3: You don't have permission to run this command!");
                 return;
             }
-            
+
+            Console.WriteLine($"Saving {Context.Channel.Id.ToString()} to file");
             await File.WriteAllTextAsync("./update", Context.Channel.Id.ToString());
             events.Save();
             config.Save();

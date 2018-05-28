@@ -25,7 +25,6 @@ namespace MPA_Bot
         private CommandHandler handler;
         private EmergencyQuestService eqService;
         private ulong updateChannel = 0;
-        private ulong restartMessage = 0;
 
         private async Task RunAsync()
         {

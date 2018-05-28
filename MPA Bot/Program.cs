@@ -21,10 +21,18 @@ namespace MPA_Bot
         private Config config;
         private EventStorage events;
         private CommandHandler handler;
-        private EmergencyQuestService eqService; 
+        private EmergencyQuestService eqService;
+        private ulong updateChannel = 0;
 
         private async Task RunAsync()
         {
+            if (File.Exists("./update"))
+            {
+                var temp = File.ReadAllText("./update");
+                ulong.TryParse(temp, out updateChannel);
+                File.Delete("./update");
+            }
+
             client = new DiscordSocketClient(new DiscordSocketConfig
             {
                 //WebSocketProvider = WS4NetProvider.Instance,
@@ -44,8 +52,7 @@ namespace MPA_Bot
             await eqService.Install(map);
 
             map = new ServiceCollection().AddSingleton(client).AddSingleton(config).AddSingleton(events).AddSingleton(eqService).BuildServiceProvider();
-
-            SuccessfulConnectionTimer();
+            
             client.Disconnected += SocketClient_Disconnected;
             client.GuildAvailable += Client_GuildAvailable;
 
@@ -62,14 +69,8 @@ namespace MPA_Bot
 
         private async Task Client_GuildAvailable(SocketGuild guild)
         {
-            if (Environment.GetEnvironmentVariable("UPDATE") != "0" &&
-                guild.TextChannels.Select(x => x.ToIDString()).Contains(Environment.GetEnvironmentVariable("UPDATE")))
-            {
-                // Not checking this will probably come back to bite me one day
-                ulong channel = ulong.Parse(Environment.GetEnvironmentVariable("UPDATE"));
-
-                await guild.GetTextChannel(channel).SendMessageAsync("yay I'm back server lives");
-            }
+            if (updateChannel != 0 && guild.GetTextChannel(updateChannel) != null)
+                await guild.GetTextChannel(updateChannel).SendMessageAsync("yay I'm back server lives");
         }
 
         private async Task SocketClient_Disconnected(Exception ex)
@@ -92,14 +93,7 @@ namespace MPA_Bot
                 }
             });
         }
-
-        private async Task SuccessfulConnectionTimer()
-        {
-            // Wait 20 minutes, and if we're still running reset the restart counter
-            await Task.Delay(1000 * 60 * 20);
-            Environment.SetEnvironmentVariable("RESTARTS", "0");
-        }
-
+        
         private Task Log(LogMessage msg)
         {
             //Console.WriteLine(msg.ToString());

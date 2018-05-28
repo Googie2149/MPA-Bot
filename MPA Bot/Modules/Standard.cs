@@ -86,7 +86,7 @@ namespace MPA_Bot
         }
 
 
-        [Command("quit")]
+        [Command("quit", RunMode = RunMode.Async)]
         [Priority(1000)]
         [Hide]
         public async Task ShutDown()
@@ -99,16 +99,13 @@ namespace MPA_Bot
 
             events.Save();
             config.Save();
-
-            Task.Run(async () =>
-            {
-                await ReplyAsync("rip");
-                await Context.Client.LogoutAsync();
-                Environment.Exit((int)ExitCodes.ExitCode.Success);
-            });
+            
+            await ReplyAsync("rip");
+            await Context.Client.LogoutAsync();
+            Environment.Exit((int)ExitCodes.ExitCode.Success);
         }
 
-        [Command("update")]
+        [Command("update", RunMode = RunMode.Async)]
         [Priority(1000)]
         [Hide]
         public async Task UpdateAndRestart()
@@ -118,17 +115,14 @@ namespace MPA_Bot
                 await RespondAsync(":no_good::skin-tone-3: You don't have permission to run this command!");
                 return;
             }
-
-            Environment.SetEnvironmentVariable("UPDATE", Context.Channel.ToIDString());
+            
+            await File.WriteAllTextAsync("./update", Context.Channel.ToIDString());
             events.Save();
             config.Save();
-
-            Task.Run(async () =>
-            {
-                await ReplyAsync("if im not back in 15 minutes, you're legally allowed to delete the server");
-                await Context.Client.LogoutAsync();
-                Environment.Exit((int)ExitCodes.ExitCode.RestartAndUpdate);
-            });
+            
+            await ReplyAsync("if im not back in 15 minutes, you're legally allowed to delete the server");
+            await Context.Client.LogoutAsync();
+            Environment.Exit((int)ExitCodes.ExitCode.RestartAndUpdate);
         }
     }
 }

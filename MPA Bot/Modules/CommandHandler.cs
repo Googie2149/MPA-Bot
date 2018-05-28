@@ -34,8 +34,8 @@ namespace MPA_Bot
             config = _services.GetService<Config>();
             events = _services.GetService<EventStorage>();
             service = _services.GetService<EmergencyQuestService>();
-
-            await commands.AddModulesAsync(Assembly.GetEntryAssembly());
+            
+            await commands.AddModulesAsync(Assembly.GetEntryAssembly(), services);
 
             //await HelpModule.Install(commands);
 

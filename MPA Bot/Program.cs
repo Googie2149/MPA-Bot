@@ -53,6 +53,7 @@ namespace MPA_Bot
             if (File.Exists("./deadlock"))
             {
                 Console.WriteLine("We're recovering from a deadlock.");
+                File.Delete("./deadlock");
                 socketClient.Connected += DeadlockRecoveryMessage;
             }
 
@@ -87,7 +88,8 @@ namespace MPA_Bot
 
         private async Task DeadlockRecoveryMessage()
         {
-            await socketClient.GetUser(config.OwnerId)?.SendMessageAsync("I recovered from a deadlock.");
+            //await socketClient.GetUser(config.OwnerId)?.SendMessageAsync("I recovered from a deadlock.");
+            (await restClient.GetUserAsync(config.OwnerId))?.SendMessageAsync("I recovered from a deadlock.");
             socketClient.Connected -= DeadlockRecoveryMessage;
         }
 

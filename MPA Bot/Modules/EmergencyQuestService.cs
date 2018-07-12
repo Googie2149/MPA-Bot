@@ -207,7 +207,7 @@ namespace MPA_Bot.Modules.PSO2
                                         output.Append(shipQuest.Name);
 
                                         if (jpComparer.Compare(shipQuest.Name, shipQuest.JpName) == 0)
-                                            output.Append($" {shipQuest.JpName}");
+                                            output.Append($" ({shipQuest.JpName})");
                                     }
 
                                     output.AppendLine();

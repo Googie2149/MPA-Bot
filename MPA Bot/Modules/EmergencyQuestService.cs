@@ -13,6 +13,7 @@ using RestSharp;
 using Newtonsoft.Json;
 using System.Net;
 using Microsoft.Extensions.DependencyInjection;
+using System.Globalization;
 
 namespace MPA_Bot.Modules.PSO2
 {
@@ -121,6 +122,8 @@ namespace MPA_Bot.Modules.PSO2
             {
                 Dictionary<ulong, EmergencyQuestConfig> check = new Dictionary<ulong, EmergencyQuestConfig>(config.ServerSettings);
 
+                Dictionary<string, string> translations;
+
                 if (!File.Exists("quests.json"))
                 {
                     //Console.WriteLine("Creating cache");
@@ -128,6 +131,14 @@ namespace MPA_Bot.Modules.PSO2
                     //Console.WriteLine("Created cache; returning...");
                     return;
                 }
+
+                if (!File.Exists("translations.json"))
+                {
+                    translations = new Dictionary<string, string>();
+                    JsonStorage.SerializeObjectToFile(translations, "translations.json");
+                }
+                else
+                    translations = JsonStorage.DeserializeObjectFromFile<Dictionary<string, string>>("translations.json");
 
                 //Console.WriteLine("Reading cache...");
                 var cache = JsonStorage.DeserializeObjectFromFile<List<EqList>>("quests.json");
@@ -171,7 +182,25 @@ namespace MPA_Bot.Modules.PSO2
                             else
                             {
                                 foreach (var shipQuest in eqs)
-                                    output.AppendLine($"`Ship {shipQuest.Ship.ToString("00")}:` {shipQuest.Name}{((shipQuest.Name != shipQuest.JpName) ? $" ({shipQuest.JpName})" : "")}");
+                                {
+                                    output.Append($"`Ship {shipQuest.Ship.ToString("00")}:` ");
+
+                                    if (translations.ContainsKey(shipQuest.Name.ToLower()))
+                                        output.Append($"{translations[shipQuest.Name.ToLower()]} ({shipQuest.JpName})");
+                                    else
+                                    {
+                                        output.Append(shipQuest.Name);
+
+                                        var comparer = StringComparer.Create(new CultureInfo("ja-JP"), true);
+
+                                        if (comparer.Compare(shipQuest.Name, shipQuest.JpName) == 0)
+                                            output.Append($" {shipQuest.JpName}");
+                                    }
+
+                                    output.AppendLine();
+
+                                    //{shipQuest.Name}{((shipQuest.Name != shipQuest.JpName) ? $" ({shipQuest.JpName})" : "")}
+                                }
                             }
 
                             Console.WriteLine(output.ToString());

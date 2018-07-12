@@ -185,8 +185,8 @@ namespace MPA_Bot.Modules.PSO2
                                 {
                                     output.Append($"`Ship {shipQuest.Ship.ToString("00")}:` ");
 
-                                    if (translations.ContainsKey(shipQuest.Name.ToLower()))
-                                        output.Append($"{translations[shipQuest.Name.ToLower()]} ({shipQuest.JpName})");
+                                    if (translations.ContainsKey(shipQuest.Name))
+                                        output.Append($"{translations[shipQuest.Name]} ({shipQuest.JpName})");
                                     else
                                     {
                                         output.Append(shipQuest.Name);

@@ -18,17 +18,17 @@ namespace MPA_Bot.Modules.PSO2
     [Group("alerts")]
     [Alias("al")]
     [RequireContext(ContextType.Guild)]
-    public class EmergencyQuest : ModuleBase
+    public class EmergencyQuest : MPAModule
     {
         private Config config;
         private EmergencyQuestService service;
-        
+
         public EmergencyQuest(EmergencyQuestService _service, Config _config)
         {
             config = _config;
             service = _service;
         }
-        
+
         [Command("add")]
         [Priority(1000)]
         public async Task SetEQ(params int[] numbers)
@@ -170,11 +170,11 @@ namespace MPA_Bot.Modules.PSO2
             await ReplyAsync($"You will stop receiving EQ alerts for any ship in <#{Context.Channel.Id}>");
         }
 
-        [Command("broadcast")]
+        [Command("broadcast", RunMode = RunMode.Async)]
         public async Task ForceBroadcast()
         {
             Console.WriteLine("Starting forced download");
-            var request = (HttpWebRequest)WebRequest.Create("http://pso2.kaze.rip/eq/");
+            var request = (HttpWebRequest)WebRequest.Create("http://pso2.rodrigo.li/eq/");
             request.Method = "GET";
             request.AllowReadStreamBuffering = false;
 
@@ -187,7 +187,7 @@ namespace MPA_Bot.Modules.PSO2
                         var data = JsonConvert.DeserializeObject<List<EqList>>(await reader.ReadToEndAsync());
 
                         Console.WriteLine("Data deserialized");
-                        
+
                         for (int i = 0; i < data.Count(); i++)
                         {
                             if (data[i].Quests.All(x => x.Ship == 0))
@@ -222,7 +222,7 @@ namespace MPA_Bot.Modules.PSO2
             if (!config.ServerSettings.ContainsKey(channel.GuildId))
                 config.ServerSettings[channel.GuildId] = new EmergencyQuestConfig();
 
-            if (config.ServerSettings[channel.GuildId].ChannelSettings.ContainsKey(channel.Id) && 
+            if (config.ServerSettings[channel.GuildId].ChannelSettings.ContainsKey(channel.Id) &&
                 config.ServerSettings[channel.GuildId].ChannelSettings[channel.Id] != null)
             {
                 ships = config.ServerSettings[channel.GuildId].ChannelSettings[channel.Id].Concat(ships).Distinct().ToList();
@@ -231,6 +231,34 @@ namespace MPA_Bot.Modules.PSO2
             config.ServerSettings[channel.GuildId].ChannelSettings[channel.Id] = ships;
 
             config.Save();
+        }
+    }
+
+    [Group("translate")]
+    [Alias("tr")]
+    public class Translation : MPAModule
+    {
+        private Dictionary<string, string> translations;
+
+        public Translation()
+        {
+            if (!File.Exists("translations.json"))
+            {
+                translations = new Dictionary<string, string>();
+                JsonStorage.SerializeObjectToFile(translations, "translations.json");
+            }
+            else
+                translations = JsonStorage.DeserializeObjectFromFile<Dictionary<string, string>>("translations.json");
+        }
+
+        [Command("add", RunMode = RunMode.Async)]
+        public async Task AddTranslation(string target, string translation)
+        {
+            translations[target] = translation;
+
+            JsonStorage.SerializeObjectToFile(translations, "translations.json");
+
+            RespondAsync($"I will now translate {target} to {translation}");
         }
     }
 }

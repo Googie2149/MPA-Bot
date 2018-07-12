@@ -16,6 +16,7 @@ using System.Net;
 namespace MPA_Bot.Modules.PSO2
 {
     [Group("alerts")]
+    [Alias("al")]
     [RequireContext(ContextType.Guild)]
     public class EmergencyQuest : ModuleBase
     {

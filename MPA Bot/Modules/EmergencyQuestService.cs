@@ -181,19 +181,32 @@ namespace MPA_Bot.Modules.PSO2
                             }
                             else
                             {
+                                var jpComparer = StringComparer.Create(new CultureInfo("ja-JP"), true);
+                                var enComparer = StringComparer.Create(new CultureInfo("en-US"), true);
+
                                 foreach (var shipQuest in eqs)
                                 {
                                     output.Append($"`Ship {shipQuest.Ship.ToString("00")}:` ");
 
-                                    if (translations.ContainsKey(shipQuest.Name))
-                                        output.Append($"{translations[shipQuest.Name]} ({shipQuest.JpName})");
+                                    var key = translations.Keys.FirstOrDefault(x =>
+                                    {
+                                        if (jpComparer.Compare(shipQuest.Name, x) == 0)
+                                            return true;
+                                        else if (enComparer.Compare(shipQuest.Name, x) == 0)
+                                            return true;
+                                        else
+                                            return false;
+                                    });
+
+                                    if (key != null)
+                                    {
+                                        output.Append($"{translations[key]} ({shipQuest.Name})");
+                                    }
                                     else
                                     {
                                         output.Append(shipQuest.Name);
 
-                                        var comparer = StringComparer.Create(new CultureInfo("ja-JP"), true);
-
-                                        if (comparer.Compare(shipQuest.Name, shipQuest.JpName) == 0)
+                                        if (jpComparer.Compare(shipQuest.Name, shipQuest.JpName) == 0)
                                             output.Append($" {shipQuest.JpName}");
                                     }
 

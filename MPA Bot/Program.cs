@@ -70,10 +70,10 @@ namespace MPA_Bot
                 }
             }
 
-            //eqService = new EmergencyQuestService();
-            //await eqService.Install(map);
+            eqService = new EmergencyQuestService();
+            await eqService.Install(map);
 
-            map = new ServiceCollection().AddSingleton(socketClient).AddSingleton(config).AddSingleton(events)/*.AddSingleton(eqService)*/.BuildServiceProvider();
+            map = new ServiceCollection().AddSingleton(socketClient).AddSingleton(config).AddSingleton(events).AddSingleton(eqService).BuildServiceProvider();
             
             socketClient.Disconnected += SocketClient_Disconnected;
             socketClient.GuildAvailable += Client_GuildAvailable;

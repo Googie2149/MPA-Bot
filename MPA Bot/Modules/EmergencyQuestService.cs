@@ -31,7 +31,7 @@ namespace MPA_Bot.Modules.PSO2
             {
                 int connectionFailure = 0;
 
-                while (true)
+                while (false)
                 {
                     //Console.WriteLine("Waiting for next attempt");
                     await Task.Delay(1000 * 60 * 3);

@@ -105,8 +105,8 @@ namespace MPA_Bot.Modules.PSO2
 
             if (Players.Count() >= MaxPlayers)
             {
-                WaitList.Add(new Player() { UserId = user.Id, Class = className, Leader = leader });
-                return true;
+                //WaitList.Add(new Player() { UserId = user.Id, Class = className, Leader = leader });
+                return false;
             }
 
             Players.Add(new Player() { UserId = user.Id, Class = className, Leader = leader });

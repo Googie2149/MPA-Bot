@@ -21,7 +21,7 @@ while true; do
 		echo "Restarting..."
 	elif [ $EXIT -eq 12 ]; then 
 		RESTARTS=$((RESTARTS + 1))
-		if [ $RESTARTS -ge 6 ]; then
+		if [ $RESTARTS -ge 60 ]; then
 			echo "Too many failed restart attempts, Discord is likely having massive issues."
 			exit 12 
 		fi;
